@@ -1,0 +1,12 @@
+# 环境配置
+spring:
+  profiles:
+    active: dev
+
+# 公共配置
+logging:
+  config: classpath:logback-spring.xml
+
+mybatis-plus:
+  type-aliases-package: top.cxscoder.system.entity
+  mapper-locations: classpath:/mapper/*Mapper.xml
