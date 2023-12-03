@@ -8,7 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import sun.misc.MessageUtils;
+
 import top.cxscoder.common.advice.ResponseResult;
 import top.cxscoder.common.cache.RedisCache;
 import top.cxscoder.common.constant.RedisConstant;

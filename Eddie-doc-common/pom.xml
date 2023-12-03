@@ -86,6 +86,12 @@
         <dependency>
             <groupId>pro.fessional</groupId>
             <artifactId>kaptcha</artifactId>
+            <exclusions>
+                <exclusion> <!-- we prefer our explicit version, though it should be the same -->
+                    <groupId>javax.servlet</groupId>
+                    <artifactId>servlet-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

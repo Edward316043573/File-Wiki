@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
-import sun.misc.MessageUtils;
 import top.cxscoder.common.cache.RedisCache;
 import top.cxscoder.common.enums.UserStatus;
 import top.cxscoder.common.exception.ServiceException;
