@@ -14,6 +14,7 @@ import sun.misc.MessageUtils;
 import top.cxscoder.common.cache.RedisCache;
 import top.cxscoder.common.enums.UserStatus;
 import top.cxscoder.common.exception.ServiceException;
+import top.cxscoder.common.exception.UnauthorizedException;
 import top.cxscoder.common.services.impl.PermissionServiceImpl;
 import top.cxscoder.system.entity.User;
 import top.cxscoder.system.service.UserService;
@@ -49,17 +50,17 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (ObjectUtils.isEmpty(user))
         {
             log.info("登录用户：{} 不存在.", username);
-            throw new ServiceException("登录用户的不存在.");
+            throw new UnauthorizedException("登录用户的不存在.");
         }
         else if (UserStatus.DELETED.getCode().equals(user.getDelFlag()))
         {
             log.info("登录用户：{} 已被删除.", username);
-            throw new ServiceException("登录用户已被删除");
+            throw new UnauthorizedException("登录用户已被删除");
         }
         else if (UserStatus.DISABLE.getCode().equals(user.getStatus()))
         {
             log.info("登录用户：{} 已被停用.", username);
-            throw new ServiceException("登录用户已被停用");
+            throw new UnauthorizedException("登录用户已被停用");
         }
         // 权限封装
 //        Set<String> list = menuMapper.selectPermsByUserId(user.getId());

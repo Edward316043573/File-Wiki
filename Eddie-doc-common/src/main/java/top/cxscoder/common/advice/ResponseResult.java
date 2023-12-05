@@ -15,14 +15,19 @@ import java.io.Serializable;
 public class ResponseResult<T> implements Serializable {
 
     /**
-     * 0 成功
+     * 200 成功
      */
     protected static final int SUCCESS_CODE = 200;
 
     /**
-     * 1 失败
+     * 500 失败
      */
     protected static final int ERROR_CODE = 500;
+
+    /**
+     * 401 认证失败
+     */
+    protected static final int AUTHORIZED_ERROR_CODE = 401;
 
     /**
      * 成功
@@ -70,5 +75,9 @@ public class ResponseResult<T> implements Serializable {
 
     public static <T> ResponseResult<T> error(String message, T data) {
         return new ResponseResult<>(ERROR_CODE, message, data);
+    }
+
+    public static <T> ResponseResult<T> authorizedError(String message, T data) {
+        return new ResponseResult<>(AUTHORIZED_ERROR_CODE, message, data);
     }
 }

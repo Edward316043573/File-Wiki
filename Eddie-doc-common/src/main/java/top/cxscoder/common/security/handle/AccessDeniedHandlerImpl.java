@@ -13,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * 权限不足处理类 返回未授权
@@ -25,6 +26,7 @@ import java.io.IOException;
 public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-       // TODO 权限不足处理
+        ResponseResult<Map<String, Object>> result = ResponseResult.error("你没有权限访问这个功能", WebUtils.buildResponseBody(accessDeniedException.getMessage(), request));
+        WebUtils.renderString(response,JSON.toJSONString(result));
     }
 }

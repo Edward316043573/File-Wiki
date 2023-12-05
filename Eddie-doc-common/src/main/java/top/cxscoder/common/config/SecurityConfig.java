@@ -27,7 +27,7 @@ import javax.annotation.Resource;
  * @copyright Copyright (c) 2023 Edward
  */
 @Configuration
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true) //权限校验注解
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     /**

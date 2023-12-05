@@ -5,7 +5,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.common.exception.UnauthorizedException;
+import top.cxscoder.common.utils.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -25,24 +27,15 @@ public class GlobalExceptionAdvice {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     @ExceptionHandler({UnauthorizedException.class})
     public ResponseResult<Map<String, Object>> globalHandler(UnauthorizedException e, HttpServletRequest request) {
-        log.error("服务端异常", e);
-        return ResponseResult.error("服务端异常", this.buildResponseBody(e.getMessage(), request));
+        log.error("认证失败", e);
+        return ResponseResult.authorizedError("认证失败", WebUtils.buildResponseBody(e.getMessage(), request));
     }
 
     @ResponseStatus(HttpStatus.OK)
-    @ExceptionHandler({Exception.class})
+    @ExceptionHandler({ServiceException.class})
     public ResponseResult<Map<String, Object>> globalHandler(Exception e, HttpServletRequest request) {
         log.error("服务端异常", e);
-        return ResponseResult.error("服务端异常", this.buildResponseBody(e.getMessage(), request));
+        return ResponseResult.error("服务端异常", WebUtils.buildResponseBody(e.getMessage(), request));
     }
 
-    private Map<String, Object> buildResponseBody(String error, HttpServletRequest request) {
-        Map<String, Object> body = new LinkedHashMap<>();
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        body.put("timestamp", LocalDateTime.now().format(dateTimeFormatter));
-        body.put("path", request.getRequestURI());
-        body.put("method", request.getMethod());
-        body.put("info", error);
-        return body;
-    }
 }

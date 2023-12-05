@@ -1,6 +1,5 @@
 package top.cxscoder.boot.controller.base;
 
-import com.google.code.kaptcha.Producer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.FastByteArrayOutputStream;
@@ -27,11 +26,6 @@ import java.util.concurrent.TimeUnit;
  */
 @RestController
 public class CaptchaController {
-    @Resource(name = "captchaProducer")
-    private Producer captchaProducer;
-
-    @Resource(name = "captchaProducerMath")
-    private Producer captchaProducerMath;
 
     @Autowired
     private RedisCache redisCache;

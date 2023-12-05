@@ -5,6 +5,8 @@ import cn.hutool.Hutool;
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTPayload;
 import cn.hutool.jwt.JWTUtil;
+import cn.hutool.jwt.JWTValidator;
+import cn.hutool.jwt.signers.JWTSignerUtil;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,13 +57,17 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
         }
         //解析token
         String userId;
+
         try {
             JWT jwt = JWTUtil.parseToken(token);
             JWTPayload payload = jwt.getPayload();
             userId = (String) payload.getClaim("uid");
+            // 验证token
+            JWTValidator.of(token).validateAlgorithm(JWTSignerUtil.hs256(userId.getBytes())).validateDate();
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException("token非法");
+            // 响应前端
         }
         //从redis中获取用户信息
         String redisKey = RedisConstant.LOGIN_KEY_PREFIX + userId;
