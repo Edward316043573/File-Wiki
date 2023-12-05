@@ -62,6 +62,7 @@ public class loginServiceImpl implements LoginService {
         String token = tokenService.createJWT(userid, loginUser);
         Map<String,String> map = new HashMap<>();
         map.put(header,token);
+        // TODO 封装一下用户信息
         //把完整的用户信息存入redis  userid作为key
         redisCache.setCacheObject(RedisConstant.LOGIN_KEY_PREFIX + userid,loginUser);
         return map;

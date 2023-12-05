@@ -1,7 +1,13 @@
 package top.cxscoder.common.services.impl;
 
+import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.jwt.JWT;
+import cn.hutool.jwt.JWTPayload;
 import cn.hutool.jwt.JWTUtil;
+import cn.hutool.jwt.JWTValidator;
+import cn.hutool.jwt.signers.JWTSignerUtil;
 import io.jsonwebtoken.JwtBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import top.cxscoder.common.security.LoginUser;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,9 +53,15 @@ public class TokenService {
      * @return
      */
     public String createJWT(String subject, LoginUser loginUser) {
+        // TODO 创建token
         Map<String, Object> map = new HashMap<>();
         map.put("uid",subject);
-        map.put("expire_time", System.currentTimeMillis() + expireTime * MILLIS_MINUTE);
+        // 设置签发时间
+        map.put(JWTPayload.ISSUED_AT,DateTime.now());
+        // 设置生效时间
+        map.put(JWTPayload.NOT_BEFORE,DateTime.now());
+        // 设置过期时间
+        map.put(JWTPayload.EXPIRES_AT,DateTime.now().offset(DateField.MINUTE,expireTime));
         String token = JWTUtil.createToken(map, subject.getBytes());
         return token;
     }
