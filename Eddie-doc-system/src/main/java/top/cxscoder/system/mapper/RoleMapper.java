@@ -1,7 +1,7 @@
 package top.cxscoder.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import top.cxscoder.system.entity.Role;
+import top.cxscoder.system.domain.entity.Role;
 
 /**
  * @author Edward

@@ -1,7 +1,9 @@
 package top.cxscoder.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import top.cxscoder.system.entity.Menu;
+import top.cxscoder.system.domain.entity.Menu;
+
+import java.util.List;
 
 /**
  * @author Edward
@@ -9,4 +11,7 @@ import top.cxscoder.system.entity.Menu;
  * @copyright Copyright (c) 2023 Edward
  */
 public interface MenuMapper extends BaseMapper<Menu> {
+    List<Menu> selectMenuListByUserId(Menu menu);
+
+    Integer checkMenuExistRole(Long menuId);
 }

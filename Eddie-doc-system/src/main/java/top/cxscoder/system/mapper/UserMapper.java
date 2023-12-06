@@ -2,7 +2,7 @@ package top.cxscoder.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
-import top.cxscoder.system.entity.User;
+import top.cxscoder.system.domain.entity.User;
 
 /**
  * @author Edward
