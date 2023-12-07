@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,9 @@ public class UserController {
 
     @Resource
     private LoginService loginService;
+
+    @Resource
+    PasswordEncoder passwordEncoder;
 
     /**
      * 获取用户列表
@@ -75,7 +79,7 @@ public class UserController {
             throw new ServiceException("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
         user.setCreateBy(loginService.getUsername());
-        user.setPassword(user.getPassword());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userService.save(user);
     }
 
@@ -127,7 +131,7 @@ public class UserController {
     {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
-        user.setPassword(user.getPassword());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setUpdateBy(loginService.getUsername());
         return userService.resetPwd(user);
     }

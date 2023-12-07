@@ -2,8 +2,10 @@ package top.cxscoder.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import top.cxscoder.system.domain.entity.Menu;
+import top.cxscoder.system.domain.entity.User;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Edward

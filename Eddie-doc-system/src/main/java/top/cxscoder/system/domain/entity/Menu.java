@@ -1,6 +1,7 @@
 package top.cxscoder.system.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
@@ -30,6 +31,7 @@ public class Menu extends BaseEntity {
     private String menuName;
 
     /** 父菜单名称 */
+    @TableField(exist = false)
     private String parentName;
 
     /** 父菜单ID */
@@ -69,5 +71,6 @@ public class Menu extends BaseEntity {
     private String icon;
 
     /** 子菜单 */
+    @TableField(exist = false)
     private List<Menu> children = new ArrayList<Menu>();
 }

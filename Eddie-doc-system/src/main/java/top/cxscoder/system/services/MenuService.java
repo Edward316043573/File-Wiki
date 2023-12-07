@@ -3,8 +3,10 @@ package top.cxscoder.system.services;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.cxscoder.system.domain.TreeSelect;
 import top.cxscoder.system.domain.entity.Menu;
+import top.cxscoder.system.domain.entity.User;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Edward
@@ -26,4 +28,5 @@ public interface MenuService extends IService<Menu> {
     boolean hasChildByMenuId(Long menuId);
 
     boolean checkMenuExistRole(Long menuId);
+
 }

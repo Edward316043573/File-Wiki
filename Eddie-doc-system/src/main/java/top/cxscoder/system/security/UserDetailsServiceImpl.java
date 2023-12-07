@@ -1,5 +1,6 @@
 package top.cxscoder.system.security;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -10,11 +11,16 @@ import org.springframework.util.ObjectUtils;
 import top.cxscoder.common.cache.RedisCache;
 import top.cxscoder.common.enums.UserStatus;
 import top.cxscoder.common.exception.UnauthorizedException;
+import top.cxscoder.system.domain.entity.Menu;
+import top.cxscoder.system.services.MenuService;
 import top.cxscoder.system.services.impl.PermissionServiceImpl;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.services.UserService;
 
 import javax.annotation.Resource;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Edward
@@ -30,7 +36,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     private UserService userService;
 
     @Resource
-    private PermissionServiceImpl permissionService;
+    private MenuService menuService;
 
     @Resource
     private RedisCache redisCache;
@@ -56,12 +62,14 @@ public class UserDetailsServiceImpl implements UserDetailsService {
             throw new UnauthorizedException("登录用户已被停用");
         }
         // 权限封装
-//        Set<String> list = menuMapper.selectPermsByUserId(user.getId());
         return createLoginUser(user);
     }
 
     public UserDetails createLoginUser(User user)
     {
-        return new LoginUser(user, permissionService.getMenuPermission(user));
+        // 获取当前用户的权限集合
+        List<Menu> menus = menuService.selectMenuList(user.getUserId());
+        Set<String> perms = menus.stream().map(m -> new String(m.getPerms())).collect(Collectors.toSet());
+        return new LoginUser(user, perms);
     }
 }

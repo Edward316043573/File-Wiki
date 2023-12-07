@@ -16,6 +16,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -41,13 +42,14 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
         List<Menu> menuList = null;
         LambdaQueryWrapper<Menu> queryWrapper = new LambdaQueryWrapper<>();
+
         // 管理员显示所有菜单信息
         User user = new User();
         if (user.isAdmin(loginUserId))
         {
-            queryWrapper.eq(Menu::getVisible,menu.getVisible())
-                    .eq(Menu::getStatus,menu.getStatus())
-                    .like(Menu::getMenuName,menu.getMenuName());
+            queryWrapper.eq(!ObjectUtils.isEmpty(menu.getVisible()),Menu::getVisible,menu.getVisible())
+                    .eq(!ObjectUtils.isEmpty(menu.getStatus()),Menu::getStatus,menu.getStatus())
+                    .like(!ObjectUtils.isEmpty(menu.getMenuName()),Menu::getMenuName,menu.getMenuName());
             menuList = menuMapper.selectList(queryWrapper);
         }
         else
@@ -100,6 +102,8 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     public boolean checkMenuExistRole(Long menuId) {
         return menuMapper.checkMenuExistRole(menuId) > 0;
     }
+
+
 
 
 }

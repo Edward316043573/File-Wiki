@@ -5,11 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import top.cxscoder.system.domain.entity.User;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Edward
@@ -92,10 +95,17 @@ public class LoginUser implements UserDetails {
         this.permissions = permissions;
     }
 
+
+    @JSONField(serialize = false)
+    private Set<SimpleGrantedAuthority> authorities;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         // TODO 重写这个方法
-        return null;
+        if(authorities!=null){
+            return authorities;
+        }
+        authorities = permissions.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
+        return authorities;
     }
 
     @Override
