@@ -39,7 +39,6 @@
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
-
             <!-- Springboot web依赖 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
