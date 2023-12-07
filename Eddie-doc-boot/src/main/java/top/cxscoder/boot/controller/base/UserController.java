@@ -74,7 +74,7 @@ public class UserController {
         {
             throw new ServiceException("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
         }
-        else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user))
+        else if (!ObjectUtils.isEmpty(user.getEmail()) && !userService.checkEmailUnique(user))
         {
             throw new ServiceException("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }
@@ -92,15 +92,16 @@ public class UserController {
     {
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
+        // TODO 这个校验需要考虑下 当前的BUG是用户只有一个也会报存在，如果改条件又会和新增的逻辑不符合
         if (!userService.checkUserNameUnique(user))
         {
             throw new ServiceException("修改用户'" + user.getUserName() + "'失败，登录账号已存在");
         }
-        else if (StringUtils.isNotEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user))
+        else if (!ObjectUtils.isEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user))
         {
             throw new ServiceException("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
         }
-        else if (StringUtils.isNotEmpty(user.getEmail()) && !userService.checkEmailUnique(user))
+        else if (!ObjectUtils.isEmpty(user.getEmail()) && !userService.checkEmailUnique(user))
         {
             throw new ServiceException("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
         }

@@ -20,7 +20,7 @@ import java.util.List;
  * @copyright Copyright (c) 2023 Edward
  */
 @RestController
-@RequestMapping("/system/menu")
+@RequestMapping("/menu")
 public class MenuController {
     @Resource
     private MenuService menuService;

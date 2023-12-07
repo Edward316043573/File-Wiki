@@ -44,14 +44,14 @@ public class loginServiceImpl implements LoginService {
     public Long getLoginUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         LoginUser loginUser = (LoginUser)authentication.getPrincipal();
-        return loginUser.getUserId();
+        return loginUser.getUser().getUserId();
     }
 
     @Override
     public String getUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         LoginUser loginUser = (LoginUser)authentication.getPrincipal();
-        return loginUser.getUsername();
+        return loginUser.getUser().getUserName();
     }
 
     @Override
