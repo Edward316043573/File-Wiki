@@ -40,9 +40,10 @@
 
         <dependency>
             <groupId>top.cxscoder</groupId>
-            <artifactId>Eddie-doc-core</artifactId>
+            <artifactId>Eddie-doc-common</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

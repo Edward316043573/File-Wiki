@@ -3,10 +3,8 @@ package top.cxscoder.boot.controller.base;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.*;
-import top.cxscoder.common.advice.ResponseResult;
-import top.cxscoder.common.security.LoginUser;
-import top.cxscoder.common.services.LoginService;
-import top.cxscoder.system.entity.LoginDTO;
+import top.cxscoder.system.services.LoginService;
+import top.cxscoder.system.domain.entity.LoginDTO;
 
 import javax.annotation.Resource;
 import java.util.Map;
