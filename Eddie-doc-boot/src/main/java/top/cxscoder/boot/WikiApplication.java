@@ -19,8 +19,7 @@ import org.springframework.context.annotation.ComponentScan;
         "top.cxscoder.wiki",
 
 })
-@MapperScan("top.cxscoder.system.mapper")
-@MapperScan("top.cxscoder.wiki.repository.manage.mapper")
+@MapperScan({"top.cxscoder.system.mapper","top.cxscoder.wiki.repository.*"})
 public class WikiApplication {
     public static void main(String[] args) {
         ConfigurableApplicationContext run = SpringApplication.run(WikiApplication.class, args);
