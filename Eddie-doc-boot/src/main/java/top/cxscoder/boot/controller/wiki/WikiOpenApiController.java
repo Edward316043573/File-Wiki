@@ -1,4 +1,4 @@
-package top.cxscoder.wiki.controller;
+package top.cxscoder.boot.controller.wiki;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -9,8 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import top.cxscoder.wiki.controller.vo.WikiPageContentVo;
-import top.cxscoder.wiki.controller.vo.WikiPageVo;
+import top.cxscoder.boot.controller.vo.WikiPageContentVo;
+import top.cxscoder.boot.controller.vo.WikiPageVo;
 import top.cxscoder.wiki.json.DocResponseJson;
 import top.cxscoder.wiki.json.ResponseJson;
 import top.cxscoder.wiki.repository.manage.mapper.WikiPageContentMapper;

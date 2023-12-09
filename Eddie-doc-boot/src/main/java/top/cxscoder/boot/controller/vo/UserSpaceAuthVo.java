@@ -1,17 +1,16 @@
-package top.cxscoder.wiki.controller.vo;
+package top.cxscoder.boot.controller.vo;
 
 import lombok.Data;
 
 /**
- * 用户页面权限信息
+ * 用户空间权限信息
  *
  * @author 暮光：城中城
- * @since 2019-06-05
+ * @since 2021-02-09
  */
 @Data
-public class UserPageAuthVo {
-	private String userName;
-	private Long userId;
+public class UserSpaceAuthVo {
+	private Long groupId;
 	private Integer editPage;
 	private Integer commentPage;
 	private Integer deletePage;

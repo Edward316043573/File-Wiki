@@ -1,4 +1,4 @@
-package top.cxscoder.wiki.controller;
+package top.cxscoder.boot.controller.wiki;
 
 import cn.hutool.core.util.IdUtil;
 import com.alibaba.fastjson.JSON;
@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
-import top.cxscoder.wiki.controller.vo.UserSpaceAuthVo;
-import top.cxscoder.wiki.controller.vo.WikiSpaceVo;
+import top.cxscoder.boot.controller.vo.UserSpaceAuthVo;
+import top.cxscoder.boot.controller.vo.WikiSpaceVo;
 import top.cxscoder.wiki.framework.consts.WikiAuthType;
 import top.cxscoder.wiki.json.DocResponseJson;
 import top.cxscoder.wiki.json.ResponseJson;
@@ -141,7 +141,7 @@ User currentUser = loginUser.getUser();
 	@PostMapping("/setting/list")
 	public ResponseJson<WikiSpace> settingList() {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+		User currentUser = loginUser.getUser();
 		QueryWrapper<UserSetting> wrapper = new QueryWrapper<>();
 		wrapper.eq("user_id", currentUser.getUserId());
 		wrapper.eq("name", UserSettingConst.WIKI_ONLY_SHOW_FAVORITE);
@@ -157,7 +157,7 @@ User currentUser = loginUser.getUser();
 	@PostMapping("/favorite/update")
 	public ResponseJson<Object> groupAuth(Long spaceId, Integer delFlag) {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+		User currentUser = loginUser.getUser();
 		QueryWrapper<WikiSpaceFavorite> wrapper = new QueryWrapper<>();
 		wrapper.eq("space_id", spaceId);
 		wrapper.eq("user_id", currentUser.getUserId());
@@ -180,7 +180,7 @@ User currentUser = loginUser.getUser();
 	public ResponseJson<Object> authAssign(Long spaceId, String authList) {
 		// 判断是否具有授权的权限
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+		User currentUser = loginUser.getUser();
 		WikiSpace wikiSpaceSel = wikiSpaceService.getById(spaceId);
 		// 只有空间创建人可以管理该空间对用户组的授权
 		if (!Objects.equals(currentUser.getUserId(), wikiSpaceSel.getCreateUserId())) {
@@ -249,7 +249,7 @@ User currentUser = loginUser.getUser();
 	private void createUserAuth(List<UserGroupAuth> userAuthList, Integer authValue, Long spaceId, WikiAuthType authType, Long groupId) {
 		if (Objects.equals(authValue, 1)) {
 			LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+			User currentUser = loginUser.getUser();
 			UserGroupAuth userAuth = new UserGroupAuth();
 			userAuth.setDataId(spaceId);
 			userAuth.setAuthType(authType.getType());

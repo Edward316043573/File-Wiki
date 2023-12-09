@@ -1,4 +1,4 @@
-package top.cxscoder.wiki.controller;
+package top.cxscoder.boot.controller.wiki;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
 import top.cxscoder.wiki.anotation.AuthMan;
-import top.cxscoder.wiki.controller.vo.UserPageAuthVo;
+import top.cxscoder.boot.controller.vo.UserPageAuthVo;
 import top.cxscoder.wiki.framework.consts.WikiAuthType;
 import top.cxscoder.wiki.json.DocResponseJson;
 import top.cxscoder.wiki.json.ResponseJson;

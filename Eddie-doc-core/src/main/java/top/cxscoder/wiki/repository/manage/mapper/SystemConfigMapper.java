@@ -14,4 +14,5 @@ import top.cxscoder.wiki.repository.manage.entity.SystemConfig;
  */
 public interface SystemConfigMapper extends BaseMapper<SystemConfig> {
 
+
 }

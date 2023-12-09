@@ -1,4 +1,4 @@
-package top.cxscoder.wiki.controller;
+package top.cxscoder.boot.controller.wiki;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +67,7 @@ public class WikiPageZanController {
     }
 
     @PostMapping("/update")
-    public ResponseJson<Object> update(WikiPageZan wikiPageZan) {
+    public ResponseJson<Object> update(@RequestBody WikiPageZan wikiPageZan) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
         Long id = wikiPageZan.getId();

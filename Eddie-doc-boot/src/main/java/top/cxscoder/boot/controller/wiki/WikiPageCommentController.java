@@ -1,16 +1,17 @@
-package top.cxscoder.wiki.controller;
+package top.cxscoder.boot.controller.wiki;
 
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
 import top.cxscoder.wiki.anotation.AuthMan;
-import top.cxscoder.wiki.controller.vo.WikiPageCommentVo;
+import top.cxscoder.boot.controller.vo.WikiPageCommentVo;
 import top.cxscoder.wiki.framework.consts.SpaceType;
 import top.cxscoder.wiki.json.DocResponseJson;
 import top.cxscoder.wiki.json.ResponseJson;
@@ -53,7 +54,7 @@ public class WikiPageCommentController {
 	private final UserMessageService userMessageService;
 	
 	@PostMapping("/list")
-	public ResponseJson<List<WikiPageCommentVo>> list(WikiPageComment pageComment) {
+	public ResponseJson<List<WikiPageCommentVo>> list(@RequestBody WikiPageComment pageComment) {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User currentUser = loginUser.getUser();
 		WikiPage wikiPageSel = wikiPageService.getById(pageComment.getPageId());
@@ -91,7 +92,7 @@ public class WikiPageCommentController {
 		WikiPageComment pageCommentSel = wikiPageCommentService.getById(id);
 		WikiPage wikiPageSel = wikiPageService.getById(pageCommentSel.getPageId());
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+		User currentUser = loginUser.getUser();
 		if (!Objects.equals(pageCommentSel.getCreateUserId(), currentUser.getUserId())) {
 			if (!Objects.equals(currentUser.getUserId(), wikiPageSel.getCreateUserId())) {
 				return DocResponseJson.warn("只有评论人或页面创建人才有权限删除此评论！");

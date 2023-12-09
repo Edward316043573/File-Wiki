@@ -1,4 +1,4 @@
-package top.cxscoder.wiki.controller;
+package top.cxscoder.boot.controller.wiki;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package top.cxscoder.wiki.controller;
+package top.cxscoder.boot.controller.wiki;
 
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -16,8 +16,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
-import top.cxscoder.wiki.controller.vo.WikiPageContentVo;
-import top.cxscoder.wiki.controller.vo.WikiPageVo;
+import top.cxscoder.boot.controller.vo.WikiPageContentVo;
+import top.cxscoder.boot.controller.vo.WikiPageVo;
 import top.cxscoder.wiki.enums.PageFileSource;
 import top.cxscoder.wiki.exception.ConfirmException;
 import top.cxscoder.wiki.framework.consts.SpaceType;
@@ -242,7 +242,7 @@ User currentUser = loginUser.getUser();
             return DocResponseJson.warn("不能移动自己到自己或自己的子节点下");
         }
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
         //获取原page信息
         WikiPage wikiPageSel = wikiPageService.getById(wikiPage.getId());
         wikiPageSel.setSpaceId(moveToSpaceId);
@@ -280,7 +280,7 @@ User currentUser = loginUser.getUser();
             return DocResponseJson.warn("不能移动自己到自己或自己的子节点下");
         }
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
         //获取原page信息
         WikiPage wikiPageSel = wikiPageService.getById(wikiPage.getId());
         Integer lastSeq = wikiPageMapper.getLastSeq(wikiPage.getSpaceId(), moveToPageId);
@@ -351,7 +351,7 @@ User currentUser = loginUser.getUser();
     @PostMapping("/rename")
     public ResponseJson<Object> rename(WikiPage wikiPage) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
         if (StringUtils.isBlank(wikiPage.getName())) {
             return DocResponseJson.warn("标题不能为空！");
         }
@@ -395,7 +395,7 @@ User currentUser = loginUser.getUser();
         DocUserDetails pageLockUser = CacheUtil.get(lockKey);
         if (pageLockUser != null) {
             LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+            User currentUser = loginUser.getUser();
             if (Objects.equals(pageLockUser.getUserId(), currentUser.getUserId())) {
                 CacheUtil.remove(lockKey);
             }
@@ -406,7 +406,7 @@ User currentUser = loginUser.getUser();
     @PostMapping("/lock")
     public ResponseJson<Object> editLock(Long pageId) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
         String lockKey = CachePrefix.WIKI_LOCK_PAGE + pageId;
         DocUserDetails pageLockUser = CacheUtil.get(lockKey);
         if (pageLockUser != null) {
@@ -427,7 +427,7 @@ User currentUser = loginUser.getUser();
     @PostMapping("/download")
     public ResponseJson<Object> download(Long pageId, HttpServletResponse response) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
         WikiPage wikiPageSel = wikiPageService.getById(pageId);
         // 页面已删除
         if (wikiPageSel == null || Objects.equals(wikiPageSel.getDelFlag(), 1)) {
@@ -481,7 +481,7 @@ User currentUser = loginUser.getUser();
     }
 
     @PostMapping("/news")
-    public ResponseJson<Object> news(SearchByEsParam param) {
+    public ResponseJson<Object> news(@RequestBody SearchByEsParam param) {
         // 空间不是自己的
         Map<Long, WikiSpace> wikiSpaceMap = this.getCanVisitWikiSpace(param.getSpaceId());
         if (wikiSpaceMap.isEmpty()) {
@@ -520,7 +520,7 @@ User currentUser = loginUser.getUser();
 
     private Map<Long, WikiSpace> getCanVisitWikiSpace(Long spaceId) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
         List<WikiSpace> spaceList;
         // 空间不是自己的
         if (spaceId == null || spaceId <= 0) {

@@ -9,4 +9,5 @@ import top.cxscoder.system.domain.entity.Role;
  * @copyright Copyright (c) 2023 Edward
  */
 public interface RoleMapper extends BaseMapper<Role> {
+
 }

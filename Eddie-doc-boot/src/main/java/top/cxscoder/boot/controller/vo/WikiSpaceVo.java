@@ -1,4 +1,4 @@
-package top.cxscoder.wiki.controller.vo;
+package top.cxscoder.boot.controller.vo;
 
 
 import lombok.Data;

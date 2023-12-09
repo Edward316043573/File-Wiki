@@ -8,5 +8,7 @@ logging:
   config: classpath:logback-spring.xml
 
 mybatis-plus:
-  type-aliases-package: top.cxscoder.system.entity
+  type-aliases-package:
+    - top.cxscoder.system.entity
+    - com.example.entity
   mapper-locations: classpath:/mapper/*Mapper.xml

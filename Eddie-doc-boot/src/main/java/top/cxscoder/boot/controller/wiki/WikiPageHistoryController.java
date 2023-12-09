@@ -1,4 +1,4 @@
-package top.cxscoder.wiki.controller;
+package top.cxscoder.boot.controller.wiki;
 
 import cn.hutool.core.util.ZipUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -45,7 +45,7 @@ public class WikiPageHistoryController {
 	private final WikiPageService wikiPageService;
 	
 	@PostMapping("/list")
-	public ResponseJson<List<WikiPageHistory>> list(Long pageId, Integer pageNum) {
+	public ResponseJson<List<WikiPageHistory>> list( Long pageId, Integer pageNum) {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User currentUser = loginUser.getUser();
 		WikiPage wikiPageSel = wikiPageService.getById(pageId);
@@ -80,7 +80,7 @@ public class WikiPageHistoryController {
 			return DocResponseJson.warn("未找到相关记录");
 		}
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+		User currentUser = loginUser.getUser();
 		WikiPage wikiPageSel = wikiPageService.getById(wikiPageHistory.getPageId());
 		WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
 		// 私人空间
