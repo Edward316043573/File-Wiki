@@ -14,11 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
-import top.cxscoder.wiki.anotation.AuthMan;
+import top.cxscoder.system.services.UserService;
 import top.cxscoder.wiki.framework.consts.Const;
 import top.cxscoder.wiki.json.DocResponseJson;
 import top.cxscoder.wiki.json.ResponseJson;
-import top.cxscoder.wiki.repository.manage.entity.UserInfo;
 import top.cxscoder.wiki.repository.manage.entity.WikiPage;
 import top.cxscoder.wiki.repository.manage.entity.WikiPageFile;
 import top.cxscoder.wiki.repository.manage.entity.WikiSpace;
@@ -39,7 +38,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@RequestMapping("/zyplayer-doc-wiki/common")
+@RequestMapping("/wiki/common")
 @RequiredArgsConstructor
 public class WikiCommonController {
 
@@ -47,23 +46,35 @@ public class WikiCommonController {
     private final WikiPageService wikiPageService;
     private final WikiSpaceService wikiSpaceService;
     private final UserInfoService userInfoService;
+
+    private final UserService userService;
     private final WikiPageFileMapper wikiPageFileMapper;
 
-    @AuthMan
+//    @AuthMan
     @PostMapping("/user/base")
     public ResponseJson<Object> userBaseInfo(String search) {
         if (StringUtils.isBlank(search)) {
             return DocResponseJson.ok();
         }
-        QueryWrapper<UserInfo> queryWrapper = new QueryWrapper<>();
+        //todo 用户表查询用户
+//        QueryWrapper<UserInfo> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.and(con -> con.and(conSub -> conSub.like("user_name", search).or().like("user_no", search)
+//                .or().like("email", search)).and(conSub -> conSub.eq("del_flag", 0)));
+//        queryWrapper.select("id", "user_name");
+//        IPage<UserInfo> page = new Page<>(1, 20, false);
+//        userInfoService.page(page, queryWrapper);
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.and(con -> con.and(conSub -> conSub.like("user_name", search).or().like("user_no", search)
                 .or().like("email", search)).and(conSub -> conSub.eq("del_flag", 0)));
         queryWrapper.select("id", "user_name");
         // 搜索最多返回20条
-        IPage<UserInfo> page = new Page<>(1, 20, false);
-        userInfoService.page(page, queryWrapper);
+        IPage<User> page = new Page<>(1, 20, false);
+        userService.page(page, queryWrapper);
         return DocResponseJson.ok(page);
     }
+
+
 
     @GetMapping("/file")
     public ResponseJson<Object> file(HttpServletResponse response, String uuid) {
@@ -79,7 +90,6 @@ public class WikiCommonController {
         // 未登录访问文件，需要判断是否是开放空间的文件
         Long pageId = Optional.ofNullable(pageFile.getPageId()).orElse(0L);
         LoginUser loginUser  = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
         if (pageId > 0 && currentUser == null) {
             WikiPage wikiPage = wikiPageService.getById(pageId);

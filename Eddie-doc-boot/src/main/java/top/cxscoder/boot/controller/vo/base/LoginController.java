@@ -1,4 +1,4 @@
-package top.cxscoder.boot.controller.base;
+package top.cxscoder.boot.controller.vo.base;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

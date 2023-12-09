@@ -1,4 +1,4 @@
-package top.cxscoder.boot.controller.base;
+package top.cxscoder.boot.controller.vo.base;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;

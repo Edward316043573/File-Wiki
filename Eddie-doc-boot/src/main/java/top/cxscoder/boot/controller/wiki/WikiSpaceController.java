@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,7 +46,7 @@ import java.util.stream.Collectors;
 
 //@AuthMan
 @RestController
-@RequestMapping("/zyplayer-doc-wiki/space")
+@RequestMapping("/wiki/space")
 @RequiredArgsConstructor
 public class WikiSpaceController {
 	
@@ -53,7 +54,8 @@ public class WikiSpaceController {
 	private final UserGroupAuthService userGroupAuthService;
 	private final WikiSpaceFavoriteService wikiSpaceFavoriteService;
 	private final UserSettingService userSettingService;
-	
+
+	@PreAuthorize("hasAnyAuthority('wiki:space:list')")
 	@PostMapping("/list")
 	public ResponseJson<List<WikiSpaceVo>> list(@RequestBody WikiSpace wikiSpace, Integer ignoreFavorite, Long pageNum, Long pageSize) {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -91,12 +93,13 @@ public class WikiSpaceController {
 		responseJson.setTotal(page.getTotal());
 		return responseJson;
 	}
-	
+
+	@PreAuthorize("hasAnyAuthority('wiki:space:list')")
 	@PostMapping("/update")
 	public ResponseJson<WikiSpace> update(WikiSpace wikiSpace) {
 		Long id = wikiSpace.getId();
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+		User currentUser = loginUser.getUser();
 		if (id != null && id > 0) {
 			WikiSpace wikiSpaceSel = wikiSpaceService.getById(id);
 			// 不是创建人不能修改空间

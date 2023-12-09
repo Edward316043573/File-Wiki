@@ -36,7 +36,7 @@ import java.util.Objects;
 @Slf4j
 @AuthMan
 @RestController
-@RequestMapping("/zyplayer-doc-wiki/page/history")
+@RequestMapping("/wiki/page/history")
 @RequiredArgsConstructor
 public class WikiPageHistoryController {
 	

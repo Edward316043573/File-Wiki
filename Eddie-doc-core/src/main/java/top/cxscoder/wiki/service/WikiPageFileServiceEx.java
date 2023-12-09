@@ -60,7 +60,7 @@ public class WikiPageFileServiceEx {
 
     public String delete(WikiPageFile wikiPageFile) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
         Long id = wikiPageFile.getId();
         if (id == null || id <= 0) {
             return "需指定删除的附件！";
@@ -88,7 +88,7 @@ User currentUser = loginUser.getUser();
     
     public DocResponseJson<Object> basicUpload(WikiPageFile wikiPageFile, MultipartFile file) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
         Long pageId = wikiPageFile.getPageId();
         if (pageId == null || pageId <= 0) {
             return DocResponseJson.warn("未指定附件关联的文档");

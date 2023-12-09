@@ -1,21 +1,9 @@
-package top.cxscoder.boot.controller.base;
+package top.cxscoder.boot.controller.vo.base;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.util.FastByteArrayOutputStream;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import top.cxscoder.common.advice.ResponseResult;
 import top.cxscoder.common.cache.RedisCache;
-
-import javax.annotation.Resource;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 验证码接口

@@ -3,6 +3,7 @@ package top.cxscoder.boot.controller.wiki;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,7 +41,7 @@ import java.util.Objects;
 @Slf4j
 @AuthMan
 @RestController
-@RequestMapping("/zyplayer-doc-wiki/page/comment")
+@RequestMapping("/wiki/page/comment")
 @RequiredArgsConstructor
 public class WikiPageCommentController {
 
@@ -52,7 +53,8 @@ public class WikiPageCommentController {
 	private final WikiPageService wikiPageService;
 	@Resource
 	private final UserMessageService userMessageService;
-	
+
+	@PreAuthorize("hasAnyAuthority('wiki:comment:list')")
 	@PostMapping("/list")
 	public ResponseJson<List<WikiPageCommentVo>> list(@RequestBody WikiPageComment pageComment) {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -86,7 +88,7 @@ public class WikiPageCommentController {
 //		}
 		return DocResponseJson.ok(pageCommentList);
 	}
-	
+	@PreAuthorize("hasAnyAuthority('wiki:comment:delete')")
 	@PostMapping("/delete")
 	public ResponseJson<Object> delete(Long id) {
 		WikiPageComment pageCommentSel = wikiPageCommentService.getById(id);
@@ -109,9 +111,9 @@ public class WikiPageCommentController {
 		userMessageService.addWikiMessage(userMessage);
 		return DocResponseJson.ok();
 	}
-	
+	@PreAuthorize("hasAnyAuthority('wiki:comment:update')")
 	@PostMapping("/update")
-	public ResponseJson<Object> update(WikiPageComment pageComment) {
+	public ResponseJson<Object> update(@RequestBody WikiPageComment pageComment) {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User currentUser = loginUser.getUser();
 		Long id = pageComment.getId();

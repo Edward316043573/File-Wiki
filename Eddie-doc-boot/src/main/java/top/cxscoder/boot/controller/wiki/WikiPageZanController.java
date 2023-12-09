@@ -37,7 +37,7 @@ import java.util.Objects;
 @Slf4j
 @AuthMan
 @RestController
-@RequestMapping("/zyplayer-doc-wiki/page/zan")
+@RequestMapping("/wiki/page/zan")
 @RequiredArgsConstructor
 public class WikiPageZanController {
 

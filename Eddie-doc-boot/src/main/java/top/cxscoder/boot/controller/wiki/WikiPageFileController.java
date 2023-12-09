@@ -29,7 +29,7 @@ import java.util.Map;
 @Slf4j
 @AuthMan
 @RestController
-@RequestMapping("/zyplayer-doc-wiki/page/file")
+@RequestMapping("/wiki/page/file")
 @RequiredArgsConstructor
 public class WikiPageFileController {
 	

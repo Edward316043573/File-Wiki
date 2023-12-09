@@ -38,7 +38,7 @@ import java.util.*;
  */
 @Slf4j
 @RestController
-@RequestMapping("/zyplayer-doc-wiki/template")
+@RequestMapping("/wiki/template")
 @RequiredArgsConstructor
 public class WikiPageTemplateController {
 

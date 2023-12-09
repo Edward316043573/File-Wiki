@@ -12,6 +12,7 @@ import org.docx4j.XmlUtils;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.AltChunkType;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import top.cxscoder.system.domain.entity.User;
@@ -55,7 +56,7 @@ import java.util.stream.Collectors;
 @Slf4j
 //@AuthMan
 @RestController
-@RequestMapping("/zyplayer-doc-wiki/page")
+@RequestMapping("/wiki/page")
 @RequiredArgsConstructor
 public class WikiPageController {
 
@@ -74,6 +75,7 @@ public class WikiPageController {
     private final WikiPageTemplateService wikiPageTemplateService;
 
 
+    @PreAuthorize("hasAnyAuthority('wiki:page:list')")
     @PostMapping("/list")
     public ResponseJson<List<WikiPageVo>> list(@RequestBody WikiPage wikiPage) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -94,10 +96,11 @@ public class WikiPageController {
         return DocResponseJson.ok(nodePageList);
     }
 
+    @PreAuthorize("hasAnyAuthority('wiki:page:detail')")
     @PostMapping("/detail")
     public ResponseJson<WikiPageContentVo> detail(WikiPage wikiPage) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
         WikiPage wikiPageSel = wikiPageService.getById(wikiPage.getId());
         // 页面已删除
         if (wikiPageSel == null || Objects.equals(wikiPageSel.getDelFlag(), 1)) {
@@ -160,7 +163,7 @@ User currentUser = loginUser.getUser();
     @PostMapping("/changeParent")
     public ResponseJson<Object> changeParent(WikiPage wikiPage, Integer beforeSeq, Integer afterSeq) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
         WikiPage wikiPageSel = wikiPageService.getById(wikiPage.getId());
         // 编辑权限判断
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
@@ -181,7 +184,7 @@ User currentUser = loginUser.getUser();
     @PostMapping("/delete")
     public ResponseJson<Object> delete(Long pageId) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
         WikiPage wikiPageSel = wikiPageService.getById(pageId);
         // 删除权限判断
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());

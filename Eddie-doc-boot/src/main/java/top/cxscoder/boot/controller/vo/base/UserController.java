@@ -1,4 +1,4 @@
-package top.cxscoder.boot.controller.base;
+package top.cxscoder.boot.controller.vo.base;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;

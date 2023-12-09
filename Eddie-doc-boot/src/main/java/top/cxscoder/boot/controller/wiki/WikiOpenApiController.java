@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping("/zyplayer-doc-wiki/open-api")
+@RequestMapping("/wiki/open-api")
 @RequiredArgsConstructor
 public class WikiOpenApiController {
 

@@ -9,10 +9,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.cxscoder.boot.controller.vo.UserPageAuthVo;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
-import top.cxscoder.wiki.anotation.AuthMan;
-import top.cxscoder.boot.controller.vo.UserPageAuthVo;
 import top.cxscoder.wiki.framework.consts.WikiAuthType;
 import top.cxscoder.wiki.json.DocResponseJson;
 import top.cxscoder.wiki.json.ResponseJson;
@@ -37,9 +36,9 @@ import java.util.stream.Stream;
  * @since 2019年2月17日
  */
 @Slf4j
-@AuthMan
+//@AuthMan
 @RestController
-@RequestMapping("/zyplayer-doc-wiki/page/auth")
+@RequestMapping("/wiki/page/auth")
 @RequiredArgsConstructor
 public class WikiPageAuthController {
 
@@ -54,6 +53,7 @@ public class WikiPageAuthController {
     private final UserGroupAuthMapper userGroupAuthMapper;
 
     @PostMapping("/assign")
+    //todo authList 权限列表
     public ResponseJson<List<WikiPageZan>> assign(Long pageId, String authList) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
@@ -120,13 +120,14 @@ public class WikiPageAuthController {
     @PostMapping("/list")
     public ResponseJson<Object> list(Long pageId) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
         WikiPage wikiPageSel = wikiPageService.getById(pageId);
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
         String canConfigAuth = wikiPageAuthService.canConfigAuth(wikiSpaceSel, pageId, currentUser.getUserId());
         if (canConfigAuth != null) {
             return DocResponseJson.warn(canConfigAuth);
         }
+        //todo 查询模块权限
         List<UserAuth> authList = userAuthService.getModuleAuthList(DocSysType.WIKI.getType(), DocSysModuleType.Wiki.PAGE.getType(), pageId);
         if (CollectionUtils.isEmpty(authList)) {
             return DocResponseJson.ok();

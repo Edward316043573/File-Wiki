@@ -34,6 +34,7 @@ public class WikiPageAuthService {
      * @param currentUserId
      * @return
      */
+    //todo 修改页面可编辑的权限
     public String canEdit(WikiSpace wikiSpaceSel, Integer editType, Long pageId, Long currentUserId) {
         if (wikiSpaceSel == null || Objects.equals(editType, 1)) {
             return "当前页面不允许编辑！";
