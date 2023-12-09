@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import top.cxscoder.wiki.framework.consts.SpaceType;
 import top.cxscoder.wiki.framework.consts.WikiAuthType;
-import top.cxscoder.wiki.repository.manage.entity.WikiSpace;
-import top.cxscoder.wiki.repository.manage.mapper.UserGroupAuthMapper;
-import top.cxscoder.wiki.repository.support.consts.DocSysModuleType;
-import top.cxscoder.wiki.repository.support.consts.DocSysType;
+import top.cxscoder.wiki.domain.entity.WikiSpace;
+import top.cxscoder.wiki.repository.mapper.UserGroupAuthMapper;
+import top.cxscoder.wiki.common.constant.DocSysModuleType;
+import top.cxscoder.wiki.common.constant.DocSysType;
 import top.cxscoder.wiki.security.DocUserUtil;
 
 import java.util.Objects;

@@ -2,8 +2,8 @@ package top.cxscoder.wiki.batch.strategy.comb;
 
 import cn.hutool.core.io.FileUtil;
 import org.springframework.stereotype.Component;
-import top.cxscoder.wiki.batch.entry.DocEntry;
-import top.cxscoder.wiki.batch.entry.MediaEntry;
+import top.cxscoder.wiki.domain.entity.DocEntry;
+import top.cxscoder.wiki.domain.entity.MediaEntry;
 
 import java.io.File;
 import java.util.ArrayList;

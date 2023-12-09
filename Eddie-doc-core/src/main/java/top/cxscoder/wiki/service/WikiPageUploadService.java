@@ -5,18 +5,18 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
-import top.cxscoder.wiki.exception.ConfirmException;
+import top.cxscoder.wiki.common.constant.DocSysType;
+import top.cxscoder.wiki.common.constant.UserMsgType;
+import top.cxscoder.wiki.domain.entity.UserMessage;
+import top.cxscoder.wiki.domain.entity.WikiPage;
+import top.cxscoder.wiki.domain.entity.WikiPageContent;
+import top.cxscoder.wiki.domain.entity.WikiSpace;
 import top.cxscoder.wiki.framework.common.MDToText;
 import top.cxscoder.wiki.framework.consts.SpaceType;
-import top.cxscoder.wiki.repository.manage.entity.UserMessage;
-import top.cxscoder.wiki.repository.manage.entity.WikiPage;
-import top.cxscoder.wiki.repository.manage.entity.WikiPageContent;
-import top.cxscoder.wiki.repository.manage.entity.WikiSpace;
-import top.cxscoder.wiki.repository.manage.mapper.WikiPageMapper;
-import top.cxscoder.wiki.repository.support.consts.DocSysType;
-import top.cxscoder.wiki.repository.support.consts.UserMsgType;
+import top.cxscoder.wiki.repository.mapper.WikiPageMapper;
 import top.cxscoder.wiki.service.common.WikiPageAuthService;
 import top.cxscoder.wiki.service.manage.*;
 
@@ -129,7 +129,7 @@ public class WikiPageUploadService {
         try {
             // 创建历史记录
             wikiPageHistoryService.saveRecord(spaceId, wikiPage.getId(), content);
-        } catch (ConfirmException e) {
+        } catch (ServiceException e) {
             return e.getMessage();
         }
         return wikiPage;

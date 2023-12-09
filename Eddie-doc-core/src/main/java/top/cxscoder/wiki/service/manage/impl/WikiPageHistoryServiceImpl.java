@@ -6,11 +6,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
-import top.cxscoder.wiki.exception.ConfirmException;
-import top.cxscoder.wiki.repository.manage.entity.WikiPageHistory;
-import top.cxscoder.wiki.repository.manage.mapper.WikiPageHistoryMapper;
+import top.cxscoder.wiki.domain.entity.WikiPageHistory;
+import top.cxscoder.wiki.repository.mapper.WikiPageHistoryMapper;
 import top.cxscoder.wiki.service.manage.WikiPageHistoryService;
 
 import java.nio.charset.StandardCharsets;
@@ -40,7 +40,7 @@ public class WikiPageHistoryServiceImpl extends ServiceImpl<WikiPageHistoryMappe
 			entity.setContent(ZipUtil.gzip(content, StandardCharsets.UTF_8.name()));
 		} catch (Exception e) {
 			logger.error("创建历史记录失败", e);
-			throw new ConfirmException("创建历史记录失败：" + e.getMessage(), e);
+			throw new ServiceException("创建历史记录失败：" + e.getMessage(), e);
 		}
 		entity.setCreateUserId(currentUser.getUserId());
 		entity.setCreateUserName(currentUser.getUserName());

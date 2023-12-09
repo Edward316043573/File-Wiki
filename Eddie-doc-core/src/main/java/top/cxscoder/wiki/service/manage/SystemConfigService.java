@@ -2,7 +2,7 @@ package top.cxscoder.wiki.service.manage;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.cxscoder.wiki.enums.SystemConfigEnum;
-import top.cxscoder.wiki.repository.manage.entity.SystemConfig;
+import top.cxscoder.wiki.domain.entity.SystemConfig;
 
 /**
  * <p>

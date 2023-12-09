@@ -3,8 +3,8 @@ package top.cxscoder.wiki.service.manage.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-import top.cxscoder.wiki.repository.manage.entity.WikiPageContent;
-import top.cxscoder.wiki.repository.manage.mapper.WikiPageContentMapper;
+import top.cxscoder.wiki.domain.entity.WikiPageContent;
+import top.cxscoder.wiki.repository.mapper.WikiPageContentMapper;
 import top.cxscoder.wiki.service.manage.WikiPageContentService;
 
 /**

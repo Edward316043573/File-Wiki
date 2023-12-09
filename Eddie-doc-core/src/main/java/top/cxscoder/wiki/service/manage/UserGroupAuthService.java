@@ -2,7 +2,7 @@ package top.cxscoder.wiki.service.manage;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import top.cxscoder.wiki.repository.manage.entity.UserGroupAuth;
+import top.cxscoder.wiki.domain.entity.UserGroupAuth;
 
 /**
  * <p>

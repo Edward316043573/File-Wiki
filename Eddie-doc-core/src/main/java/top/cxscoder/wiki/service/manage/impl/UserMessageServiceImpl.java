@@ -4,10 +4,10 @@ package top.cxscoder.wiki.service.manage.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import top.cxscoder.system.domain.entity.User;
-import top.cxscoder.wiki.repository.manage.entity.UserMessage;
-import top.cxscoder.wiki.repository.manage.mapper.UserMessageMapper;
-import top.cxscoder.wiki.repository.support.consts.DocSysType;
-import top.cxscoder.wiki.repository.support.consts.UserMsgType;
+import top.cxscoder.wiki.domain.entity.UserMessage;
+import top.cxscoder.wiki.repository.mapper.UserMessageMapper;
+import top.cxscoder.wiki.common.constant.DocSysType;
+import top.cxscoder.wiki.common.constant.UserMsgType;
 import top.cxscoder.wiki.service.manage.UserMessageService;
 
 import java.util.Date;

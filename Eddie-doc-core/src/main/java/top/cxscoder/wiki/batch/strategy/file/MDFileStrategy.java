@@ -6,8 +6,8 @@ import org.apache.commons.codec.Charsets;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import top.cxscoder.wiki.repository.manage.entity.WikiPage;
-import top.cxscoder.wiki.repository.manage.entity.WikiPageFile;
+import top.cxscoder.wiki.domain.entity.WikiPage;
+import top.cxscoder.wiki.domain.entity.WikiPageFile;
 import top.cxscoder.wiki.service.WikiPageUploadService;
 import top.cxscoder.wiki.service.manage.WikiPageService;
 

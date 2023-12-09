@@ -15,23 +15,23 @@ import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
-import top.cxscoder.boot.controller.vo.WikiPageContentVo;
-import top.cxscoder.boot.controller.vo.WikiPageVo;
+import top.cxscoder.wiki.domain.entity.*;
+import top.cxscoder.wiki.domain.vo.WikiPageContentVo;
+import top.cxscoder.wiki.domain.vo.WikiPageVo;
 import top.cxscoder.wiki.enums.PageFileSource;
-import top.cxscoder.wiki.exception.ConfirmException;
 import top.cxscoder.wiki.framework.consts.SpaceType;
 import top.cxscoder.wiki.json.DocResponseJson;
 import top.cxscoder.wiki.json.ResponseJson;
-import top.cxscoder.wiki.repository.manage.entity.*;
-import top.cxscoder.wiki.repository.manage.mapper.WikiPageContentMapper;
-import top.cxscoder.wiki.repository.manage.mapper.WikiPageMapper;
-import top.cxscoder.wiki.repository.manage.param.SearchByEsParam;
-import top.cxscoder.wiki.repository.manage.vo.SpaceNewsVo;
-import top.cxscoder.wiki.repository.manage.vo.WikiPageTemplateInfoVo;
-import top.cxscoder.wiki.repository.support.consts.DocSysType;
-import top.cxscoder.wiki.repository.support.consts.UserMsgType;
+import top.cxscoder.wiki.repository.mapper.WikiPageContentMapper;
+import top.cxscoder.wiki.repository.mapper.WikiPageMapper;
+import top.cxscoder.wiki.domain.SearchByEsParam;
+import top.cxscoder.wiki.domain.vo.SpaceNewsVo;
+import top.cxscoder.wiki.domain.vo.WikiPageTemplateInfoVo;
+import top.cxscoder.wiki.common.constant.DocSysType;
+import top.cxscoder.wiki.common.constant.UserMsgType;
 import top.cxscoder.wiki.security.DocUserDetails;
 import top.cxscoder.wiki.service.WikiPageUploadService;
 import top.cxscoder.wiki.service.common.WikiPageAuthService;
@@ -386,7 +386,7 @@ public class WikiPageController {
         try {
             // 创建历史记录
             wikiPageHistoryService.saveRecord(spaceId, wikiPage.getId(), pageContent.getContent());
-        } catch (ConfirmException e) {
+        } catch (ServiceException e) {
             return DocResponseJson.warn(e.getMessage());
         }
         return DocResponseJson.ok(wikiPage);

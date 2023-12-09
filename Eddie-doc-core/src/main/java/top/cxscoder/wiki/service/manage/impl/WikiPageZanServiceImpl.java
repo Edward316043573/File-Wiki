@@ -7,9 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
-import top.cxscoder.wiki.repository.manage.entity.WikiPageZan;
-import top.cxscoder.wiki.repository.manage.mapper.WikiPageMapper;
-import top.cxscoder.wiki.repository.manage.mapper.WikiPageZanMapper;
+import top.cxscoder.wiki.domain.entity.WikiPageZan;
+import top.cxscoder.wiki.repository.mapper.WikiPageMapper;
+import top.cxscoder.wiki.repository.mapper.WikiPageZanMapper;
 import top.cxscoder.wiki.service.manage.WikiPageZanService;
 
 import javax.annotation.Resource;

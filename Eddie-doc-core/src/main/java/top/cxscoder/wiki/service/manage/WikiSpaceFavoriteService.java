@@ -1,7 +1,7 @@
 package top.cxscoder.wiki.service.manage;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import top.cxscoder.wiki.repository.manage.entity.WikiSpaceFavorite;
+import top.cxscoder.wiki.domain.entity.WikiSpaceFavorite;
 
 import java.util.List;
 

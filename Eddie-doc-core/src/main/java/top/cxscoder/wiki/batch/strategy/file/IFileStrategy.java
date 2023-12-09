@@ -3,7 +3,7 @@ package top.cxscoder.wiki.batch.strategy.file;
 
 import org.springframework.web.multipart.MultipartFile;
 import top.cxscoder.wiki.batch.strategy.base.IConditionalStrategy;
-import top.cxscoder.wiki.repository.manage.entity.WikiPageFile;
+import top.cxscoder.wiki.domain.entity.WikiPageFile;
 
 import java.io.IOException;
 

@@ -1,9 +1,9 @@
 package top.cxscoder.wiki.service.manage;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import top.cxscoder.wiki.repository.manage.entity.WikiPageTemplate;
-import top.cxscoder.wiki.repository.manage.vo.WikiPageTemplateInfoVo;
-import top.cxscoder.wiki.repository.manage.vo.WikiTemplateTagVo;
+import top.cxscoder.wiki.domain.entity.WikiPageTemplate;
+import top.cxscoder.wiki.domain.vo.WikiPageTemplateInfoVo;
+import top.cxscoder.wiki.domain.vo.WikiTemplateTagVo;
 
 import java.util.List;
 

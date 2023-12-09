@@ -10,14 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
 import top.cxscoder.wiki.batch.BatchDocImportManager;
-import top.cxscoder.wiki.batch.entry.DocEntry;
-import top.cxscoder.wiki.batch.entry.MediaEntry;
-import top.cxscoder.wiki.exception.ConfirmException;
-import top.cxscoder.wiki.repository.manage.entity.WikiPage;
-import top.cxscoder.wiki.repository.manage.entity.WikiPageFile;
+import top.cxscoder.wiki.domain.entity.DocEntry;
+import top.cxscoder.wiki.domain.entity.MediaEntry;
+import top.cxscoder.wiki.domain.entity.WikiPage;
+import top.cxscoder.wiki.domain.entity.WikiPageFile;
 import top.cxscoder.wiki.service.WikiPageUploadService;
 import top.cxscoder.wiki.service.manage.WikiPageFileService;
 import top.cxscoder.wiki.service.manage.WikiPageService;
@@ -83,7 +83,7 @@ User currentUser = loginUser.getUser();
                 File newFile = new File(savePath);
                 if (!newFile.exists() && !newFile.mkdirs()) {
                     log.warn("创建文件夹失败{}", savePath);
-                    throw new ConfirmException("创建文件夹失败");
+                    throw new ServiceException("创建文件夹失败");
                 }
                 String simpleUUID = IdUtil.simpleUUID();
                 savePath += simpleUUID + "." + FileUtil.getSuffix(media.getOldFileLink());
@@ -96,7 +96,7 @@ User currentUser = loginUser.getUser();
                 } catch (Exception e) {
                     e.printStackTrace();
                     log.error("保存文件失败{}", savePath);
-                    throw new ConfirmException("保存文件失败");
+                    throw new ServiceException("保存文件失败");
                 }
                 mediaWikiPageFile.setFileSize(FileUtil.size(mediaFile));
                 mediaWikiPageFile.setUuid(simpleUUID);

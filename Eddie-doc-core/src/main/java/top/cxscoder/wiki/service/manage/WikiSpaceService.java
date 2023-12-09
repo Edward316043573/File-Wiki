@@ -2,7 +2,7 @@ package top.cxscoder.wiki.service.manage;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import top.cxscoder.wiki.repository.manage.entity.WikiSpace;
+import top.cxscoder.wiki.domain.entity.WikiSpace;
 
 /**
  * <p>

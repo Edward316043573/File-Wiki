@@ -13,7 +13,7 @@ import top.cxscoder.wiki.batch.BatchDocImportManager;
 import top.cxscoder.wiki.enums.PageFileSource;
 import top.cxscoder.wiki.json.DocResponseJson;
 import top.cxscoder.wiki.json.ResponseJson;
-import top.cxscoder.wiki.repository.manage.entity.WikiPageFile;
+import top.cxscoder.wiki.domain.entity.WikiPageFile;
 import top.cxscoder.wiki.service.WikiPageFileServiceEx;
 
 import java.util.HashMap;

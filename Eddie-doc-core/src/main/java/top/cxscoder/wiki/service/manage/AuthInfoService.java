@@ -1,7 +1,7 @@
 package top.cxscoder.wiki.service.manage;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import top.cxscoder.wiki.repository.manage.entity.AuthInfo;
+import top.cxscoder.wiki.domain.entity.AuthInfo;
 
 /**
  * <p>

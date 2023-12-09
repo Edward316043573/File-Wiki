@@ -4,8 +4,8 @@ package top.cxscoder.wiki.service.manage.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
-import top.cxscoder.wiki.repository.manage.entity.AuthInfo;
-import top.cxscoder.wiki.repository.manage.mapper.AuthInfoMapper;
+import top.cxscoder.wiki.domain.entity.AuthInfo;
+import top.cxscoder.wiki.repository.mapper.AuthInfoMapper;
 import top.cxscoder.wiki.service.manage.AuthInfoService;
 
 /**

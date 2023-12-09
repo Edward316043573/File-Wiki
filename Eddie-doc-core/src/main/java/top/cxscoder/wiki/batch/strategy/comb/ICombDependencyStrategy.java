@@ -1,6 +1,6 @@
 package top.cxscoder.wiki.batch.strategy.comb;
 
-import top.cxscoder.wiki.batch.entry.DocEntry;
+import top.cxscoder.wiki.domain.entity.DocEntry;
 import top.cxscoder.wiki.batch.strategy.base.IConditionalStrategy;
 
 import java.io.File;

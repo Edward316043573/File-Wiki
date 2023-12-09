@@ -7,12 +7,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
-import top.cxscoder.wiki.repository.manage.entity.UserMessage;
-import top.cxscoder.wiki.repository.manage.entity.WikiPage;
-import top.cxscoder.wiki.repository.manage.mapper.WikiPageMapper;
-import top.cxscoder.wiki.repository.manage.vo.WikiPageTemplateInfoVo;
-import top.cxscoder.wiki.repository.support.consts.DocSysType;
-import top.cxscoder.wiki.repository.support.consts.UserMsgType;
+import top.cxscoder.wiki.domain.entity.UserMessage;
+import top.cxscoder.wiki.domain.entity.WikiPage;
+import top.cxscoder.wiki.repository.mapper.WikiPageMapper;
+import top.cxscoder.wiki.domain.vo.WikiPageTemplateInfoVo;
+import top.cxscoder.wiki.common.constant.DocSysType;
+import top.cxscoder.wiki.common.constant.UserMsgType;
 import top.cxscoder.wiki.service.manage.UserMessageService;
 import top.cxscoder.wiki.service.manage.WikiPageService;
 

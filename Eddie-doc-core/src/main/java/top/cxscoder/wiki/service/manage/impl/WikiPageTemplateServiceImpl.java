@@ -4,10 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
-import top.cxscoder.wiki.repository.manage.entity.WikiPageTemplate;
-import top.cxscoder.wiki.repository.manage.mapper.WikiPageTemplateMapper;
-import top.cxscoder.wiki.repository.manage.vo.WikiPageTemplateInfoVo;
-import top.cxscoder.wiki.repository.manage.vo.WikiTemplateTagVo;
+import top.cxscoder.wiki.domain.entity.WikiPageTemplate;
+import top.cxscoder.wiki.repository.mapper.WikiPageTemplateMapper;
+import top.cxscoder.wiki.domain.vo.WikiPageTemplateInfoVo;
+import top.cxscoder.wiki.domain.vo.WikiTemplateTagVo;
 import top.cxscoder.wiki.service.manage.WikiPageTemplateService;
 
 import java.util.List;

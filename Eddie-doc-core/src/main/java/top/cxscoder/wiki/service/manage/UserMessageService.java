@@ -3,9 +3,9 @@ package top.cxscoder.wiki.service.manage;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.cxscoder.system.domain.entity.User;
-import top.cxscoder.wiki.repository.manage.entity.UserMessage;
-import top.cxscoder.wiki.repository.support.consts.DocSysType;
-import top.cxscoder.wiki.repository.support.consts.UserMsgType;
+import top.cxscoder.wiki.domain.entity.UserMessage;
+import top.cxscoder.wiki.common.constant.DocSysType;
+import top.cxscoder.wiki.common.constant.UserMsgType;
 
 /**
  * <p>

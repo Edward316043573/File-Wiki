@@ -3,9 +3,9 @@ package top.cxscoder.wiki.security;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import top.cxscoder.wiki.repository.manage.entity.UserAuth;
-import top.cxscoder.wiki.repository.support.consts.DocSysModuleType;
-import top.cxscoder.wiki.repository.support.consts.DocSysType;
+import top.cxscoder.wiki.domain.entity.UserAuth;
+import top.cxscoder.wiki.common.constant.DocSysModuleType;
+import top.cxscoder.wiki.common.constant.DocSysType;
 
 import java.io.Serializable;
 

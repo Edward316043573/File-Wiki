@@ -6,8 +6,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
-import top.cxscoder.wiki.repository.manage.entity.WikiSpaceFavorite;
-import top.cxscoder.wiki.repository.manage.mapper.WikiSpaceFavoriteMapper;
+import top.cxscoder.wiki.domain.entity.WikiSpaceFavorite;
+import top.cxscoder.wiki.repository.mapper.WikiSpaceFavoriteMapper;
 import top.cxscoder.wiki.service.manage.WikiSpaceFavoriteService;
 
 import java.util.List;

@@ -7,12 +7,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
+import top.cxscoder.wiki.domain.entity.SystemConfig;
 import top.cxscoder.wiki.enums.SystemConfigEnum;
-import top.cxscoder.wiki.exception.ConfirmException;
-import top.cxscoder.wiki.repository.manage.entity.SystemConfig;
-import top.cxscoder.wiki.repository.manage.mapper.SystemConfigMapper;
+import top.cxscoder.wiki.repository.mapper.SystemConfigMapper;
 import top.cxscoder.wiki.service.manage.SystemConfigService;
 
 import java.util.Date;
@@ -63,7 +63,7 @@ public class SystemConfigServiceImpl extends ServiceImpl<SystemConfigMapper, Sys
 	public void deleteRecord(Long id) {
 		SystemConfig systemConfig = getById(id);
 		if (systemConfig == null) {
-			throw new ConfirmException("未找到该记录");
+			throw new ServiceException("未找到该记录");
 		}
 		this.removeById(id);
 	}

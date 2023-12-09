@@ -6,12 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import top.cxscoder.wiki.batch.entry.DocEntry;
+import top.cxscoder.wiki.domain.entity.DocEntry;
 import top.cxscoder.wiki.batch.strategy.ConditionalStrategySelector;
 import top.cxscoder.wiki.batch.strategy.comb.ICombDependencyStrategy;
 import top.cxscoder.wiki.batch.strategy.file.IFileStrategy;
 import top.cxscoder.wiki.json.DocResponseJson;
-import top.cxscoder.wiki.repository.manage.entity.WikiPageFile;
+import top.cxscoder.wiki.domain.entity.WikiPageFile;
 
 import javax.annotation.Resource;
 import java.io.File;

@@ -42,6 +42,10 @@ public final class ServiceException extends RuntimeException
         this.code = code;
     }
 
+    public ServiceException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public String getDetailMessage()
     {
         return detailMessage;
@@ -63,6 +67,7 @@ public final class ServiceException extends RuntimeException
         this.message = message;
         return this;
     }
+
 
     public ServiceException setDetailMessage(String detailMessage)
     {
