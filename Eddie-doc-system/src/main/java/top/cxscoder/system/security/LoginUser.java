@@ -99,7 +99,7 @@ public class LoginUser implements UserDetails {
     private Set<SimpleGrantedAuthority> authorities;
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // TODO 重写这个方法
+        // 封装权限
         if(authorities!=null){
             return authorities;
         }

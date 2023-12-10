@@ -19,6 +19,8 @@ import java.util.Arrays;
  * @date 2023-11-30 19:24
  * @copyright Copyright (c) 2023 Edward
  */
+@RestController
+@RequestMapping("/role")
 public class RoleController {
 
     @Resource

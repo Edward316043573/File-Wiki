@@ -1,6 +1,7 @@
 package top.cxscoder.system.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
@@ -49,15 +50,19 @@ public class Role extends BaseEntity {
     /** 删除标志（0代表存在 2代表删除） */
     private String delFlag;
 
+    @TableField(exist = false)
     /** 用户是否存在此角色标识 默认不存在 */
     private boolean flag = false;
 
+    @TableField(exist = false)
     /** 菜单组 */
     private Long[] menuIds;
 
+    @TableField(exist = false)
     /** 部门组（数据权限） */
     private Long[] deptIds;
 
+    @TableField(exist = false)
     /** 角色菜单权限 */
     private Set<String> permissions;
 
