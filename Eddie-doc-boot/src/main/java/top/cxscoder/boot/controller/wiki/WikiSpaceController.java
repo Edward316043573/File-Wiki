@@ -17,17 +17,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
+import top.cxscoder.wiki.common.constant.DocSysType;
+import top.cxscoder.wiki.common.constant.UserSettingConst;
+import top.cxscoder.wiki.domain.dto.WikiSpaceDTO;
+import top.cxscoder.wiki.domain.entity.UserGroupAuth;
+import top.cxscoder.wiki.domain.entity.UserSetting;
+import top.cxscoder.wiki.domain.entity.WikiSpace;
+import top.cxscoder.wiki.domain.entity.WikiSpaceFavorite;
 import top.cxscoder.wiki.domain.vo.UserSpaceAuthVo;
 import top.cxscoder.wiki.domain.vo.WikiSpaceVo;
 import top.cxscoder.wiki.framework.consts.WikiAuthType;
 import top.cxscoder.wiki.json.DocResponseJson;
 import top.cxscoder.wiki.json.ResponseJson;
-import top.cxscoder.wiki.domain.entity.UserGroupAuth;
-import top.cxscoder.wiki.domain.entity.UserSetting;
-import top.cxscoder.wiki.domain.entity.WikiSpace;
-import top.cxscoder.wiki.domain.entity.WikiSpaceFavorite;
-import top.cxscoder.wiki.common.constant.DocSysType;
-import top.cxscoder.wiki.common.constant.UserSettingConst;
 import top.cxscoder.wiki.service.manage.UserGroupAuthService;
 import top.cxscoder.wiki.service.manage.UserSettingService;
 import top.cxscoder.wiki.service.manage.WikiSpaceFavoriteService;
@@ -55,31 +56,31 @@ public class WikiSpaceController {
 	private final WikiSpaceFavoriteService wikiSpaceFavoriteService;
 	private final UserSettingService userSettingService;
 
-	@PreAuthorize("hasAnyAuthority('wiki:space:list')")
+//	@PreAuthorize("hasAnyAuthority('wiki:space:list')")
 	@PostMapping("/list")
-	public ResponseJson<List<WikiSpaceVo>> list(@RequestBody WikiSpace wikiSpace, Integer ignoreFavorite, Long pageNum, Long pageSize) {
+	public List<WikiSpaceVo> list(@RequestBody WikiSpaceDTO wikiSpaceDTO) {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User currentUser = loginUser.getUser();
 		//		DocUserDetails currentUser = DocUserUtil.getCurrentUser();
 		LambdaQueryWrapper<WikiSpace> wrapper = new LambdaQueryWrapper<>();
 		wrapper.eq(WikiSpace::getDelFlag, 0);
-		wrapper.eq(wikiSpace.getId() != null, WikiSpace::getId, wikiSpace.getId());
+		wrapper.eq(wikiSpaceDTO.getId() != null, WikiSpace::getId, wikiSpaceDTO.getId());
 		wrapper.and(con -> con.and(conSub -> conSub.eq(WikiSpace::getType, 3).eq(WikiSpace::getCreateUserId, currentUser.getUserId())).or().in(WikiSpace::getType, 1, 2));
 		// 收藏的空间
 		List<WikiSpaceFavorite> favoriteList = wikiSpaceFavoriteService.myFavoriteSpaceList();
 		Set<Long> favoriteSpaceIds = favoriteList.stream().map(WikiSpaceFavorite::getSpaceId).collect(Collectors.toSet());
 		// 只展示收藏的空间
-		if (!Objects.equals(ignoreFavorite, 1)) {
+		if (!Objects.equals(wikiSpaceDTO.getIgnoreFavorite(), 1)) {
 			String onlyShowFavorite = userSettingService.getMySettingValue(UserSettingConst.WIKI_ONLY_SHOW_FAVORITE);
 			if (Objects.equals(onlyShowFavorite, "1")) {
 				if (favoriteSpaceIds.isEmpty()) {
-					return DocResponseJson.ok();
+					return null;
 				}
 				wrapper.in(WikiSpace::getId, favoriteSpaceIds);
 			}
 		}
-		pageNum = Optional.ofNullable(pageNum).orElse(1L);
-		pageSize = Optional.ofNullable(pageSize).orElse(500L);
+		long pageNum = Optional.ofNullable(wikiSpaceDTO.getPage()).orElse(1L);
+		long pageSize = Optional.ofNullable(wikiSpaceDTO.getPageSize()).orElse(500L);
 		pageNum = Math.min(Math.max(pageNum, 1L), 1000);
 		pageSize = Math.min(Math.max(pageSize, 10L), 100);
 		IPage<WikiSpace> page = new Page<>(pageNum, pageSize, Objects.equals(pageNum, 1L));
@@ -89,9 +90,7 @@ public class WikiSpaceController {
 		for (WikiSpaceVo spaceVo : spaceVoList) {
 			spaceVo.setFavorite(favoriteSpaceIds.contains(spaceVo.getId()) ? 1 : 0);
 		}
-		DocResponseJson<List<WikiSpaceVo>> responseJson = DocResponseJson.ok(spaceVoList);
-		responseJson.setTotal(page.getTotal());
-		return responseJson;
+		return spaceVoList;
 	}
 
 	@PreAuthorize("hasAnyAuthority('wiki:space:list')")

@@ -18,10 +18,10 @@ public class PageVo implements Serializable {
     /**
      * 页码
      */
-    private Integer page = 1;
+    private Long page = 1L;
 
     /**
      * 分页大小
      */
-    private Integer pageSize = 10;
+    private Long pageSize = 10L;
 }
