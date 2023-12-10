@@ -3,7 +3,6 @@ package top.cxscoder.boot.controller.wiki;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,16 +11,16 @@ import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
 import top.cxscoder.wiki.anotation.AuthMan;
-import top.cxscoder.wiki.domain.vo.WikiPageCommentVo;
-import top.cxscoder.wiki.framework.consts.SpaceType;
-import top.cxscoder.wiki.json.DocResponseJson;
-import top.cxscoder.wiki.json.ResponseJson;
+import top.cxscoder.wiki.common.constant.DocSysType;
+import top.cxscoder.wiki.common.constant.UserMsgType;
 import top.cxscoder.wiki.domain.entity.UserMessage;
 import top.cxscoder.wiki.domain.entity.WikiPage;
 import top.cxscoder.wiki.domain.entity.WikiPageComment;
 import top.cxscoder.wiki.domain.entity.WikiSpace;
-import top.cxscoder.wiki.common.constant.DocSysType;
-import top.cxscoder.wiki.common.constant.UserMsgType;
+import top.cxscoder.wiki.domain.vo.WikiPageCommentVo;
+import top.cxscoder.wiki.framework.consts.SpaceType;
+import top.cxscoder.wiki.json.DocResponseJson;
+import top.cxscoder.wiki.json.ResponseJson;
 import top.cxscoder.wiki.service.manage.UserMessageService;
 import top.cxscoder.wiki.service.manage.WikiPageCommentService;
 import top.cxscoder.wiki.service.manage.WikiPageService;
@@ -54,7 +53,7 @@ public class WikiPageCommentController {
 	@Resource
 	private final UserMessageService userMessageService;
 
-	@PreAuthorize("hasAnyAuthority('wiki:comment:list')")
+//	@PreAuthorize("hasAnyAuthority('wiki:comment:list')")
 	@PostMapping("/list")
 	public ResponseJson<List<WikiPageCommentVo>> list(@RequestBody WikiPageComment pageComment) {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -88,7 +87,7 @@ public class WikiPageCommentController {
 //		}
 		return DocResponseJson.ok(pageCommentList);
 	}
-	@PreAuthorize("hasAnyAuthority('wiki:comment:delete')")
+//	@PreAuthorize("hasAnyAuthority('wiki:comment:delete')")
 	@PostMapping("/delete")
 	public ResponseJson<Object> delete(Long id) {
 		WikiPageComment pageCommentSel = wikiPageCommentService.getById(id);
@@ -111,7 +110,7 @@ public class WikiPageCommentController {
 		userMessageService.addWikiMessage(userMessage);
 		return DocResponseJson.ok();
 	}
-	@PreAuthorize("hasAnyAuthority('wiki:comment:update')")
+//	@PreAuthorize("hasAnyAuthority('wiki:comment:update')")
 	@PostMapping("/update")
 	public ResponseJson<Object> update(@RequestBody WikiPageComment pageComment) {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

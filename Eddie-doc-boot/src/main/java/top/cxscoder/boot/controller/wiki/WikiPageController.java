@@ -12,14 +12,21 @@ import org.docx4j.XmlUtils;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.AltChunkType;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
+import top.cxscoder.wiki.common.constant.DocSysType;
+import top.cxscoder.wiki.common.constant.UserMsgType;
+import top.cxscoder.wiki.domain.SearchByEsParam;
 import top.cxscoder.wiki.domain.entity.*;
+import top.cxscoder.wiki.domain.vo.SpaceNewsVo;
 import top.cxscoder.wiki.domain.vo.WikiPageContentVo;
+import top.cxscoder.wiki.domain.vo.WikiPageTemplateInfoVo;
 import top.cxscoder.wiki.domain.vo.WikiPageVo;
 import top.cxscoder.wiki.enums.PageFileSource;
 import top.cxscoder.wiki.framework.consts.SpaceType;
@@ -27,11 +34,6 @@ import top.cxscoder.wiki.json.DocResponseJson;
 import top.cxscoder.wiki.json.ResponseJson;
 import top.cxscoder.wiki.repository.mapper.WikiPageContentMapper;
 import top.cxscoder.wiki.repository.mapper.WikiPageMapper;
-import top.cxscoder.wiki.domain.SearchByEsParam;
-import top.cxscoder.wiki.domain.vo.SpaceNewsVo;
-import top.cxscoder.wiki.domain.vo.WikiPageTemplateInfoVo;
-import top.cxscoder.wiki.common.constant.DocSysType;
-import top.cxscoder.wiki.common.constant.UserMsgType;
 import top.cxscoder.wiki.security.DocUserDetails;
 import top.cxscoder.wiki.service.WikiPageUploadService;
 import top.cxscoder.wiki.service.common.WikiPageAuthService;
@@ -75,7 +77,7 @@ public class WikiPageController {
     private final WikiPageTemplateService wikiPageTemplateService;
 
 
-    @PreAuthorize("hasAnyAuthority('wiki:page:list')")
+//    @PreAuthorize("hasAnyAuthority('wiki:page:list')")
     @PostMapping("/list")
     public ResponseJson<List<WikiPageVo>> list(@RequestBody WikiPage wikiPage) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -96,7 +98,7 @@ public class WikiPageController {
         return DocResponseJson.ok(nodePageList);
     }
 
-    @PreAuthorize("hasAnyAuthority('wiki:page:detail')")
+//    @PreAuthorize("hasAnyAuthority('wiki:page:detail')")
     @PostMapping("/detail")
     public ResponseJson<WikiPageContentVo> detail(WikiPage wikiPage) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

@@ -16,7 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
  */
 @Slf4j
 @RestControllerAdvice(basePackages = {"top.cxscoder.boot.controller"})
-public class GlobalResponseBodyAdvice implements ResponseBodyAdvice<Object> {
+public class  GlobalResponseBodyAdvice implements ResponseBodyAdvice<Object> {
 
     @Override
     @SuppressWarnings("all")

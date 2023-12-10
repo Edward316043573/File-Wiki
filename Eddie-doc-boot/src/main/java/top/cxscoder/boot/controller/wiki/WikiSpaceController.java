@@ -9,7 +9,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +18,7 @@ import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
 import top.cxscoder.wiki.common.constant.DocSysType;
 import top.cxscoder.wiki.common.constant.UserSettingConst;
-import top.cxscoder.wiki.domain.dto.WikiSpaceDTO;
+import top.cxscoder.wiki.domain.DTO.WikiSpaceDTO;
 import top.cxscoder.wiki.domain.entity.UserGroupAuth;
 import top.cxscoder.wiki.domain.entity.UserSetting;
 import top.cxscoder.wiki.domain.entity.WikiSpace;
@@ -93,9 +92,9 @@ public class WikiSpaceController {
 		return spaceVoList;
 	}
 
-	@PreAuthorize("hasAnyAuthority('wiki:space:list')")
+//	@PreAuthorize("hasAnyAuthority('wiki:space:list')")
 	@PostMapping("/update")
-	public ResponseJson<WikiSpace> update(WikiSpace wikiSpace) {
+	public ResponseJson<WikiSpace> update(@RequestBody WikiSpace wikiSpace) {
 		Long id = wikiSpace.getId();
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User currentUser = loginUser.getUser();
@@ -121,7 +120,7 @@ public class WikiSpaceController {
 	@PostMapping("/setting/update")
 	public ResponseJson<WikiSpace> settingUpdate(String name, String value) {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+		User currentUser = loginUser.getUser();
 		QueryWrapper<UserSetting> wrapper = new QueryWrapper<>();
 		wrapper.eq("user_id", currentUser.getUserId());
 		wrapper.eq("name", name);

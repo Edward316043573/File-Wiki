@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.system.domain.entity.User;
@@ -50,7 +51,7 @@ public class WikiPageTemplateController {
 
 
     @PostMapping("/add")
-    public ResponseJson<Object> addTemplate(WikiPageTemplate wikiPageTemplate) {
+    public ResponseJson<Object> addTemplate(@RequestBody WikiPageTemplate wikiPageTemplate) {
         WikiPageTemplate exist = wikiPageTemplateService.getWikiPageTemplateBySpaceAndPage(wikiPageTemplate.getSpaceId(), wikiPageTemplate.getPageId());
         if (null == exist) {
             LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -73,7 +74,7 @@ public class WikiPageTemplateController {
     @PostMapping("/allTags")
     public ResponseJson<Object> allTags(boolean open) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
 
         List<WikiTemplateTagVo> allTags = wikiPageTemplateService.getAllTags(currentUser.getUserId(),open);
         return DocResponseJson.ok(allTags);
@@ -82,7 +83,7 @@ User currentUser = loginUser.getUser();
     @PostMapping("/filterAll")
     public ResponseJson<Object> filterAll(String name, boolean open, HttpServletRequest request, Long pageNum) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+        User currentUser = loginUser.getUser();
         List tagList = new ArrayList();
         Set<Map.Entry<String, String[]>> entries = request.getParameterMap().entrySet();
         entries.forEach(param -> {
