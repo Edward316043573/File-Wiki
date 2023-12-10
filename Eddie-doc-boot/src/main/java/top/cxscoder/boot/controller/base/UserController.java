@@ -3,16 +3,15 @@ package top.cxscoder.boot.controller.base;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import top.cxscoder.common.exception.ServiceException;
-import top.cxscoder.system.services.LoginService;
 import top.cxscoder.system.domain.DTO.UserDTO;
 import top.cxscoder.system.domain.entity.User;
+import top.cxscoder.system.services.LoginService;
 import top.cxscoder.system.services.RoleService;
 import top.cxscoder.system.services.UserService;
 
@@ -38,6 +37,7 @@ public class UserController {
 
     @Resource
     PasswordEncoder passwordEncoder;
+
 
     /**
      * 获取用户列表
@@ -148,6 +148,14 @@ public class UserController {
         userService.checkUserDataScope(user.getUserId());
         user.setUpdateBy(loginService.getUsername());
         return userService.updateUserStatus(user);
+    }
+
+//    @PreAuthorize("hasAnyAuthority('system:user:selfInfo')")
+    @PostMapping("/selfInfo")
+    public User selfInfo() {
+        User user = loginService.getCurrentUser();
+        user.setPassword(null);
+        return user;
     }
 
 

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
+import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.common.constant.DocSysType;
 import top.cxscoder.wiki.common.constant.UserMsgType;
 import top.cxscoder.wiki.domain.SearchByEsParam;
@@ -75,17 +76,16 @@ public class WikiPageController {
     private final WikiPageMapper wikiPageMapper;
     private final WikiPageCommentService wikiPageCommentService;
     private final WikiPageTemplateService wikiPageTemplateService;
-
+    private final LoginService loginService;
 
 //    @PreAuthorize("hasAnyAuthority('wiki:page:list')")
     @PostMapping("/list")
-    public ResponseJson<List<WikiPageVo>> list(@RequestBody WikiPage wikiPage) {
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = loginUser.getUser();
+    public List<WikiPageVo> list(@RequestBody WikiPage wikiPage) {
+        User currentUser = loginService.getCurrentUser();
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPage.getSpaceId());
         // 私人空间
         if (SpaceType.isOthersPrivate(wikiSpaceSel.getType(), currentUser.getUserId(), wikiSpaceSel.getCreateUserId())) {
-            return DocResponseJson.warn("您没有权限查看该空间的文章列表！");
+            throw new ServiceException("您没有权限查看该空间的文章列表！");
         }
 
         List<WikiPageTemplateInfoVo> wikiPageList = wikiPageService.wikiPageTemplateInfos(wikiPage.getSpaceId());
@@ -95,7 +95,7 @@ public class WikiPageController {
             nodePageList = nodePageList.stream().sorted(Comparator.comparingInt(WikiPageVo::getSeqNo)).collect(Collectors.toList());
             this.setChildren(listMap, nodePageList, "");
         }
-        return DocResponseJson.ok(nodePageList);
+        return nodePageList;
     }
 
 //    @PreAuthorize("hasAnyAuthority('wiki:page:detail')")
@@ -424,7 +424,7 @@ public class WikiPageController {
     }
 
     @PostMapping("/searchByEs")
-    public ResponseJson<Object> searchByEs(SearchByEsParam param) {
+    public List<SpaceNewsVo> searchByEs(SearchByEsParam param) {
         param.setNewsType(1);
         return this.news(param);
     }
@@ -486,11 +486,11 @@ public class WikiPageController {
     }
 
     @PostMapping("/news")
-    public ResponseJson<Object> news(@RequestBody SearchByEsParam param) {
+    public List<SpaceNewsVo> news(@RequestBody SearchByEsParam param) {
         // 空间不是自己的
         Map<Long, WikiSpace> wikiSpaceMap = this.getCanVisitWikiSpace(param.getSpaceId());
         if (wikiSpaceMap.isEmpty()) {
-            return DocResponseJson.ok();
+            return null;
         }
         param.setSpaceIds(new ArrayList<>(wikiSpaceMap.keySet()));
         String keywords = param.getKeywords();
@@ -499,8 +499,8 @@ public class WikiPageController {
         }
         // 分页查询
         List<SpaceNewsVo> spaceNewsVoList = wikiPageContentMapper.getNewsList(param);
-        if (spaceNewsVoList == null || spaceNewsVoList.isEmpty()) {
-            return DocResponseJson.ok();
+        if (CollectionUtils.isEmpty(spaceNewsVoList)) {
+            return null;
         }
         spaceNewsVoList.forEach(val -> {
             val.setSpaceName(wikiSpaceMap.get(val.getSpaceId()).getName());
@@ -520,7 +520,7 @@ public class WikiPageController {
             }
             val.setPageTitle(pageTitle);
         });
-        return DocResponseJson.ok(spaceNewsVoList);
+        return spaceNewsVoList;
     }
 
     private Map<Long, WikiSpace> getCanVisitWikiSpace(Long spaceId) {
