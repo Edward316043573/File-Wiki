@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
 import top.cxscoder.wiki.common.constant.DocSysType;
@@ -26,8 +27,6 @@ import top.cxscoder.wiki.domain.entity.WikiSpaceFavorite;
 import top.cxscoder.wiki.domain.vo.UserSpaceAuthVo;
 import top.cxscoder.wiki.domain.vo.WikiSpaceVo;
 import top.cxscoder.wiki.framework.consts.WikiAuthType;
-import top.cxscoder.wiki.json.DocResponseJson;
-import top.cxscoder.wiki.json.ResponseJson;
 import top.cxscoder.wiki.service.manage.UserGroupAuthService;
 import top.cxscoder.wiki.service.manage.UserSettingService;
 import top.cxscoder.wiki.service.manage.WikiSpaceFavoriteService;
@@ -94,7 +93,7 @@ public class WikiSpaceController {
 
 //	@PreAuthorize("hasAnyAuthority('wiki:space:list')")
 	@PostMapping("/update")
-	public ResponseJson<WikiSpace> update(@RequestBody WikiSpace wikiSpace) {
+	public WikiSpace update(@RequestBody WikiSpace wikiSpace) {
 		Long id = wikiSpace.getId();
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User currentUser = loginUser.getUser();
@@ -102,7 +101,7 @@ public class WikiSpaceController {
 			WikiSpace wikiSpaceSel = wikiSpaceService.getById(id);
 			// 不是创建人不能修改空间
 			if (!Objects.equals(currentUser.getUserId(), wikiSpaceSel.getCreateUserId())) {
-				return DocResponseJson.warn("您没有该空间的编辑权！");
+				throw new ServiceException("您没有权限修改该空间");
 			}
 			wikiSpace.setUuid(null);
 			wikiSpace.setEditType(null);
@@ -114,11 +113,11 @@ public class WikiSpaceController {
 			wikiSpace.setCreateUserName(currentUser.getUserName());
 			wikiSpaceService.save(wikiSpace);
 		}
-		return DocResponseJson.ok(wikiSpace);
+		return wikiSpace;
 	}
 	
 	@PostMapping("/setting/update")
-	public ResponseJson<WikiSpace> settingUpdate(String name, String value) {
+	public void settingUpdate(String name, String value) {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User currentUser = loginUser.getUser();
 		QueryWrapper<UserSetting> wrapper = new QueryWrapper<>();
@@ -136,11 +135,10 @@ public class WikiSpaceController {
 		userSettingUp.setDelFlag(0);
 		userSettingUp.setUserId(currentUser.getUserId());
 		userSettingService.saveOrUpdate(userSettingUp);
-		return DocResponseJson.ok();
 	}
 	
 	@PostMapping("/setting/list")
-	public ResponseJson<WikiSpace> settingList() {
+	public Map<String, String> settingList() {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User currentUser = loginUser.getUser();
 		QueryWrapper<UserSetting> wrapper = new QueryWrapper<>();
@@ -149,14 +147,14 @@ public class WikiSpaceController {
 		wrapper.eq("del_flag", 0);
 		List<UserSetting> settingList = userSettingService.list(wrapper);
 		if (CollectionUtils.isEmpty(settingList)) {
-			return DocResponseJson.ok();
+			return null;
 		}
 		Map<String, String> userSettingMap = settingList.stream().collect(Collectors.toMap(UserSetting::getName, UserSetting::getValue));
-		return DocResponseJson.ok(userSettingMap);
+		return userSettingMap;
 	}
 	
 	@PostMapping("/favorite/update")
-	public ResponseJson<Object> groupAuth(Long spaceId, Integer delFlag) {
+	public void groupAuth(Long spaceId, Integer delFlag) {
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User currentUser = loginUser.getUser();
 		QueryWrapper<WikiSpaceFavorite> wrapper = new QueryWrapper<>();
@@ -173,19 +171,18 @@ public class WikiSpaceController {
 		favoriteUp.setUserId(currentUser.getUserId());
 		favoriteUp.setSpaceId(spaceId);
 		wikiSpaceFavoriteService.saveOrUpdate(favoriteUp);
-		return DocResponseJson.ok();
 	}
 
 	//Todo
 	@PostMapping("/auth/assign")
-	public ResponseJson<Object> authAssign(Long spaceId, String authList) {
+	public void authAssign(Long spaceId, String authList) {
 		// 判断是否具有授权的权限
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User currentUser = loginUser.getUser();
 		WikiSpace wikiSpaceSel = wikiSpaceService.getById(spaceId);
 		// 只有空间创建人可以管理该空间对用户组的授权
 		if (!Objects.equals(currentUser.getUserId(), wikiSpaceSel.getCreateUserId())) {
-			return DocResponseJson.warn("您没有权限管理该空间的权限");
+			throw new ServiceException("您没有权限管理该空间的权限");
 		}
 		// 先删除页面的所有用户的权限
 		QueryWrapper<UserGroupAuth> updateWrapper = new QueryWrapper<>();
@@ -205,25 +202,24 @@ public class WikiSpaceController {
 				userGroupAuthService.saveBatch(userAuthList);
 			}
 		}
-		return DocResponseJson.ok();
 	}
 	
 	@PostMapping("/auth/list")
-	public ResponseJson<Object> authList(Long spaceId) {
+	public List<UserSpaceAuthVo> authList(Long spaceId) {
 		// 判断是否具有授权的权限
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User currentUser = loginUser.getUser();
 		WikiSpace wikiSpaceSel = wikiSpaceService.getById(spaceId);
 		// 只有空间创建人可以管理该空间对用户组的授权
 		if (!Objects.equals(currentUser.getUserId(), wikiSpaceSel.getCreateUserId())) {
-			return DocResponseJson.warn("您没有权限管理该空间的权限");
+			throw new ServiceException("您没有权限管理该空间的权限");
 		}
 		QueryWrapper<UserGroupAuth> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("data_id", spaceId);
 		queryWrapper.eq("project_type", DocSysType.WIKI.getType());
 		List<UserGroupAuth> authList = userGroupAuthService.list(queryWrapper);
 		if (CollectionUtils.isEmpty(authList)) {
-			return DocResponseJson.ok();
+			return null;
 		}
 		// 查询用户信息
 		Map<Long, List<UserGroupAuth>> userAuthGroup = authList.stream().collect(Collectors.groupingBy(UserGroupAuth::getGroupId));
@@ -240,7 +236,7 @@ public class WikiSpaceController {
 			authVo.setGroupId(key);
 			authVoList.add(authVo);
 		});
-		return DocResponseJson.ok(authVoList);
+		return authVoList;
 	}
 	
 	private Integer haveAuth(Set<Integer> authNameSet, WikiAuthType wikiAuthType) {

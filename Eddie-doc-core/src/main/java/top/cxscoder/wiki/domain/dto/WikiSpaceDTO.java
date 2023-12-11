@@ -1,4 +1,4 @@
-package top.cxscoder.wiki.domain.dto;
+package top.cxscoder.wiki.domain.DTO;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;

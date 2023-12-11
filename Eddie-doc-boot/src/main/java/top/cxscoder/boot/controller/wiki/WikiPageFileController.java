@@ -3,10 +3,7 @@ package top.cxscoder.boot.controller.wiki;
 import com.alibaba.fastjson.JSONObject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import top.cxscoder.wiki.anotation.AuthMan;
 import top.cxscoder.wiki.batch.BatchDocImportManager;
@@ -37,12 +34,13 @@ public class WikiPageFileController {
 	private final BatchDocImportManager batchDocImportManger;
 	
 	@PostMapping("/delete")
-	public ResponseJson<Object> delete(WikiPageFile wikiPageFile) {
+	public void delete(@RequestBody WikiPageFile wikiPageFile) {
 		String info = wikiPageFileServiceEx.delete(wikiPageFile);
-		if (null != info) {
-			return DocResponseJson.warn(info);
-		}
-		return DocResponseJson.ok();
+		//todo 处理删除失败
+//		if (null != info) {
+//			return DocResponseJson.warn(info);
+//		}
+//		return DocResponseJson.ok();
 	}
 	
 	@PostMapping("/wangEditor/upload")

@@ -51,7 +51,7 @@ public class WikiPageTemplateController {
 
 
     @PostMapping("/add")
-    public ResponseJson<Object> addTemplate(@RequestBody WikiPageTemplate wikiPageTemplate) {
+    public void addTemplate(@RequestBody WikiPageTemplate wikiPageTemplate) {
         WikiPageTemplate exist = wikiPageTemplateService.getWikiPageTemplateBySpaceAndPage(wikiPageTemplate.getSpaceId(), wikiPageTemplate.getPageId());
         if (null == exist) {
             LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -68,20 +68,19 @@ public class WikiPageTemplateController {
             exist.setShareStatus(wikiPageTemplate.getShareStatus());
             wikiPageTemplateService.updateById(exist);
         }
-        return DocResponseJson.ok();
     }
 
     @PostMapping("/allTags")
-    public ResponseJson<Object> allTags(boolean open) {
+    public List<WikiTemplateTagVo> allTags(boolean open) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
 
         List<WikiTemplateTagVo> allTags = wikiPageTemplateService.getAllTags(currentUser.getUserId(),open);
-        return DocResponseJson.ok(allTags);
+        return allTags;
     }
 
     @PostMapping("/filterAll")
-    public ResponseJson<Object> filterAll(String name, boolean open, HttpServletRequest request, Long pageNum) {
+    public List<WikiPageTemplateInfoVo> filterAll(String name, boolean open, HttpServletRequest request, Long pageNum) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
         List tagList = new ArrayList();
@@ -96,11 +95,13 @@ public class WikiPageTemplateController {
         }
         List<WikiPageTemplateInfoVo> wikiPageTemplateInfoVos = wikiPageTemplateService.filterAll(currentUser.getUserId(), name, open, tagList, pageNum);
         Long total = wikiPageTemplateService.total(currentUser.getUserId(), name, open, tagList);
+        //todo total 是什么
         DocResponseJson<Object> ok = DocResponseJson.ok(wikiPageTemplateInfoVos);
         ok.setTotal(total);
-        return ok;
+        return wikiPageTemplateInfoVos;
     }
 
+    //todo 修改返回结果
     @PostMapping("/use")
     public ResponseJson<Object> use(Long spaceId, Long parentId, String templateId) {
         WikiPageTemplate template = wikiPageTemplateService.getById(templateId);
