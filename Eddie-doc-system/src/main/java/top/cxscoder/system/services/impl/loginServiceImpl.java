@@ -11,6 +11,7 @@ import org.springframework.util.StringUtils;
 import top.cxscoder.common.cache.RedisCache;
 import top.cxscoder.common.constant.RedisConstant;
 import top.cxscoder.common.exception.UnauthorizedException;
+import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
 import top.cxscoder.system.services.LoginService;
 
@@ -48,11 +49,20 @@ public class loginServiceImpl implements LoginService {
     }
 
     @Override
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        LoginUser loginUser = (LoginUser)authentication.getPrincipal();
+        return loginUser.getUser();
+    }
+
+    @Override
     public String getUsername() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         LoginUser loginUser = (LoginUser)authentication.getPrincipal();
         return loginUser.getUser().getUserName();
     }
+
+
 
     @Override
     public Map<String,String> Login(String username, String password, String code) {

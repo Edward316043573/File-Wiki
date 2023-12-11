@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.domain.SearchByEsParam;
 import top.cxscoder.wiki.domain.entity.WikiPage;
 import top.cxscoder.wiki.domain.entity.WikiPageContent;
@@ -25,6 +26,7 @@ import top.cxscoder.wiki.service.manage.WikiPageFileService;
 import top.cxscoder.wiki.service.manage.WikiPageService;
 import top.cxscoder.wiki.service.manage.WikiSpaceService;
 
+import javax.annotation.Resource;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -45,6 +47,9 @@ public class WikiOpenApiController {
     private final WikiPageContentService wikiPageContentService;
     private final WikiPageFileService wikiPageFileService;
     private final WikiPageContentMapper wikiPageContentMapper;
+
+    @Resource
+    LoginService loginService;
 
     @PostMapping("/space/info")
     public ResponseJson<WikiSpace> spaceInfo(String space) {

@@ -1,6 +1,7 @@
 package top.cxscoder.system.services;
 
 
+import top.cxscoder.system.domain.entity.User;
 
 import java.util.Map;
 
@@ -18,4 +19,6 @@ public interface LoginService {
     Long getLoginUserId();
 
     String getUsername();
+
+    User getCurrentUser();
 }

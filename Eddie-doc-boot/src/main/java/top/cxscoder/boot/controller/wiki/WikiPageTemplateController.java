@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
+import top.cxscoder.system.services.LoginService;
+import top.cxscoder.wiki.domain.dto.WikiTemplateFilterDTO;
 import top.cxscoder.wiki.json.DocResponseJson;
 import top.cxscoder.wiki.json.ResponseJson;
 import top.cxscoder.wiki.domain.entity.WikiPage;
@@ -26,8 +28,8 @@ import top.cxscoder.wiki.service.manage.WikiPageFileService;
 import top.cxscoder.wiki.service.manage.WikiPageService;
 import top.cxscoder.wiki.service.manage.WikiPageTemplateService;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -48,6 +50,7 @@ public class WikiPageTemplateController {
     private final WikiPageUploadService wikipageUploadService;
     private final WikiPageTemplateService wikiPageTemplateService;
     private final WikiPageFileService wikiPageFileService;
+    private final LoginService loginService;
 
 
     @PostMapping("/add")
@@ -72,36 +75,24 @@ public class WikiPageTemplateController {
 
     @PostMapping("/allTags")
     public List<WikiTemplateTagVo> allTags(boolean open) {
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = loginUser.getUser();
-
+        User currentUser = loginService.getCurrentUser();
         List<WikiTemplateTagVo> allTags = wikiPageTemplateService.getAllTags(currentUser.getUserId(),open);
         return allTags;
     }
 
     @PostMapping("/filterAll")
-    public List<WikiPageTemplateInfoVo> filterAll(String name, boolean open, HttpServletRequest request, Long pageNum) {
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = loginUser.getUser();
-        List tagList = new ArrayList();
-        Set<Map.Entry<String, String[]>> entries = request.getParameterMap().entrySet();
-        entries.forEach(param -> {
-            if (param.getKey().contains("].tagName") && !"".equals(param.getValue()[0])) {
-                tagList.add(param.getValue()[0]);
-            }
-        });
+    public List<WikiPageTemplateInfoVo> filterAll(@RequestBody WikiTemplateFilterDTO wikiPageTemplateFilterDTO) {
+        User currentUser = loginService.getCurrentUser();
+        List<String> tagList;
+        List<WikiTemplateTagVo> tags = wikiPageTemplateFilterDTO.getTags();
+        tagList = tags.stream().map(WikiTemplateTagVo::getTagName).distinct().collect(Collectors.toList());
         if (tagList.isEmpty()) {
             tagList.add("");
         }
-        List<WikiPageTemplateInfoVo> wikiPageTemplateInfoVos = wikiPageTemplateService.filterAll(currentUser.getUserId(), name, open, tagList, pageNum);
-        Long total = wikiPageTemplateService.total(currentUser.getUserId(), name, open, tagList);
-        //todo total 是什么
-        DocResponseJson<Object> ok = DocResponseJson.ok(wikiPageTemplateInfoVos);
-        ok.setTotal(total);
+        List<WikiPageTemplateInfoVo> wikiPageTemplateInfoVos = wikiPageTemplateService.filterAll(currentUser.getUserId(), wikiPageTemplateFilterDTO.getName(),wikiPageTemplateFilterDTO.isOpen() , tagList, wikiPageTemplateFilterDTO.getPageNum());
         return wikiPageTemplateInfoVos;
     }
 
-    //todo 修改返回结果
     @PostMapping("/use")
     public ResponseJson<Object> use(Long spaceId, Long parentId, String templateId) {
         WikiPageTemplate template = wikiPageTemplateService.getById(templateId);
