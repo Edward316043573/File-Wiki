@@ -1,4 +1,4 @@
-package top.cxscoder.wiki.framework.common;
+package top.cxscoder.wiki.uitls;
 
 import org.commonmark.node.Node;
 import org.commonmark.parser.Parser;

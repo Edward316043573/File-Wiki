@@ -3,23 +3,23 @@ package top.cxscoder.wiki.service;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
-import top.cxscoder.system.security.LoginUser;
+import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.common.constant.DocSysType;
 import top.cxscoder.wiki.common.constant.UserMsgType;
 import top.cxscoder.wiki.domain.entity.UserMessage;
 import top.cxscoder.wiki.domain.entity.WikiPage;
 import top.cxscoder.wiki.domain.entity.WikiPageContent;
 import top.cxscoder.wiki.domain.entity.WikiSpace;
-import top.cxscoder.wiki.framework.common.MDToText;
 import top.cxscoder.wiki.framework.consts.SpaceType;
 import top.cxscoder.wiki.repository.mapper.WikiPageMapper;
 import top.cxscoder.wiki.service.common.WikiPageAuthService;
 import top.cxscoder.wiki.service.manage.*;
+import top.cxscoder.wiki.uitls.MDToText;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,11 +41,12 @@ public class WikiPageUploadService {
     private final WikiPageAuthService wikiPageAuthService;
     private final UserMessageService userMessageService;
     private final WikiPageHistoryService wikiPageHistoryService;
+    @Resource
+    LoginService loginService;
 
 
     public Object update(WikiPage wikiPage, String content, String preview) {
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = loginUser.getUser();
+        User currentUser = loginService.getCurrentUser();
         WikiPageContent pageContent = new WikiPageContent();
         pageContent.setContent(content);
         if (wikiPage.getEditorType() == 2) {

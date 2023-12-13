@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
+import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.anotation.AuthMan;
 import top.cxscoder.wiki.domain.entity.WikiPage;
 import top.cxscoder.wiki.domain.entity.WikiPageHistory;
@@ -22,6 +23,7 @@ import top.cxscoder.wiki.service.manage.WikiPageHistoryService;
 import top.cxscoder.wiki.service.manage.WikiPageService;
 import top.cxscoder.wiki.service.manage.WikiSpaceService;
 
+import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
@@ -41,27 +43,26 @@ public class WikiPageHistoryController {
 	private final WikiPageHistoryService wikiPageHistoryService;
 	private final WikiSpaceService wikiSpaceService;
 	private final WikiPageService wikiPageService;
-	
+
+	@Resource
+	private LoginService loginService;
+
 	@PostMapping("/list")
 	public IPage<WikiPageHistory> list( Long pageId, Integer pageNum) {
-		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		User currentUser = loginUser.getUser();
+		User currentUser = loginService.getCurrentUser();
 		WikiPage wikiPageSel = wikiPageService.getById(pageId);
 		// 私人空间
 		if (wikiPageSel == null || Objects.equals(wikiPageSel.getDelFlag(), 1)) {
 			return null;
-//			return DocResponseJson.ok();
 		}
 		WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
 		// 空间已删除
 		if (wikiSpaceSel == null || Objects.equals(wikiSpaceSel.getDelFlag(), 1)) {
 			return null;
-//			return DocResponseJson.ok();
 		}
 		// 私人空间
 		if (SpaceType.isOthersPrivate(wikiSpaceSel.getType(), currentUser.getUserId(), wikiSpaceSel.getCreateUserId())) {
-//			return DocResponseJson.warn("您没有权限查看该空间的文章详情！");
-			throw new ServiceException("您没有权限查看该空间的文章详情");
+			throw new ServiceException("您没有权限查看该空间的文章详情！");
 		}
 		LambdaQueryWrapper<WikiPageHistory> wrapper = new LambdaQueryWrapper<>();
 		wrapper.eq(WikiPageHistory::getPageId, pageId);
@@ -78,8 +79,7 @@ public class WikiPageHistoryController {
 	public String detail(Long id) {
 		WikiPageHistory wikiPageHistory = wikiPageHistoryService.getById(id);
 		if (wikiPageHistory == null) {
-//			return DocResponseJson.warn("未找到相关记录");
-			throw new RuntimeException("未找到相关记录");
+			throw new ServiceException("未找到相关记录");
 		}
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		User currentUser = loginUser.getUser();
@@ -87,17 +87,14 @@ public class WikiPageHistoryController {
 		WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
 		// 私人空间
 		if (SpaceType.isOthersPrivate(wikiSpaceSel.getType(), currentUser.getUserId(), wikiSpaceSel.getCreateUserId())) {
-//			return DocResponseJson.warn("您没有权限查看该空间的文章详情！");
 			throw new ServiceException("您没有权限查看该空间的文章详情！");
 		}
 		try {
 			byte[] bytes = ZipUtil.unGzip(wikiPageHistory.getContent());
-//			return DocResponseJson.ok(new String(bytes, StandardCharsets.UTF_8));
 			return new String(bytes, StandardCharsets.UTF_8);
 		} catch (Exception e) {
 			log.error("解析文档内容失败", e);
-//			return DocResponseJson.warn("解析文档内容失败：" + e.getMessage());
-			throw new RuntimeException("解析文档内容失败：" + e.getMessage());
+			throw new ServiceException("解析文档内容失败：" + e.getMessage());
 		}
 	}
 }
