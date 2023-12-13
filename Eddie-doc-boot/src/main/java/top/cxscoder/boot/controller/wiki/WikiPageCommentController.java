@@ -18,8 +18,6 @@ import top.cxscoder.wiki.domain.entity.WikiPage;
 import top.cxscoder.wiki.domain.entity.WikiPageComment;
 import top.cxscoder.wiki.domain.entity.WikiSpace;
 import top.cxscoder.wiki.framework.consts.SpaceType;
-import top.cxscoder.wiki.json.DocResponseJson;
-import top.cxscoder.wiki.json.ResponseJson;
 import top.cxscoder.wiki.service.manage.UserMessageService;
 import top.cxscoder.wiki.service.manage.WikiPageCommentService;
 import top.cxscoder.wiki.service.manage.WikiPageService;
@@ -93,14 +91,15 @@ public class WikiPageCommentController {
     //	@PreAuthorize("hasAnyAuthority('wiki:comment:delete')")
     @DeleteMapping("/{id}}")
     @Transactional
-    public ResponseJson<Object> delete(@PathVariable Long id) {
+    public void delete(@PathVariable Long id) {
         WikiPageComment pageCommentSel = wikiPageCommentService.getById(id);
         WikiPage wikiPageSel = wikiPageService.getById(pageCommentSel.getPageId());
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
         if (!Objects.equals(pageCommentSel.getCreateUserId(), currentUser.getUserId())) {
             if (!Objects.equals(currentUser.getUserId(), wikiPageSel.getCreateUserId())) {
-                return DocResponseJson.warn("只有评论人或页面创建人才有权限删除此评论！");
+//                return DocResponseJson.warn("只有评论人或页面创建人才有权限删除此评论！");
+                throw new ServiceException("只有评论人或页面创建人才有权限删除此评论！");
             }
         }
         WikiPageComment pageComment = new WikiPageComment();
@@ -112,7 +111,6 @@ public class WikiPageCommentController {
         userMessage.setAffectUserId(wikiPageSel.getCreateUserId());
         userMessage.setAffectUserName(wikiPageSel.getCreateUserName());
         userMessageService.addWikiMessage(userMessage);
-        return DocResponseJson.ok();
     }
 
     //	@PreAuthorize("hasAnyAuthority('wiki:comment:update')")

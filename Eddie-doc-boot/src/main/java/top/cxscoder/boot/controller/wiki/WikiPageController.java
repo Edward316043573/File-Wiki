@@ -31,8 +31,6 @@ import top.cxscoder.wiki.domain.vo.WikiPageTemplateInfoVo;
 import top.cxscoder.wiki.domain.vo.WikiPageVo;
 import top.cxscoder.wiki.enums.PageFileSource;
 import top.cxscoder.wiki.framework.consts.SpaceType;
-import top.cxscoder.wiki.json.DocResponseJson;
-import top.cxscoder.wiki.json.ResponseJson;
 import top.cxscoder.wiki.repository.mapper.WikiPageContentMapper;
 import top.cxscoder.wiki.repository.mapper.WikiPageMapper;
 import top.cxscoder.wiki.security.DocUserDetails;
@@ -285,9 +283,10 @@ public class WikiPageController {
     }
 
     @PostMapping("/copy")
-    public ResponseJson<Object> copy(WikiPage wikiPage, Long moveToPageId, Long moveToSpaceId) {
+    public void copy(@RequestBody WikiPage wikiPage, Long moveToPageId, Long moveToSpaceId) {
         if (isLassoDoll(wikiPage, moveToPageId)) {
-            return DocResponseJson.warn("不能移动自己到自己或自己的子节点下");
+//            return DocResponseJson.warn("不能移动自己到自己或自己的子节点下");
+            throw new ServiceException("不能移动自己到自己或自己的子节点下");
         }
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
@@ -355,18 +354,19 @@ public class WikiPageController {
         // 给相关人发送消息
         UserMessage userMessage = userMessageService.createUserMessage(currentUser, wikiPageSel.getId(), wikiPageSel.getName(), DocSysType.WIKI, UserMsgType.WIKI_PAGE_COPY);
         userMessageService.addWikiMessage(userMessage);
-        return DocResponseJson.ok();
     }
 
     @PostMapping("/rename")
-    public ResponseJson<Object> rename(WikiPage wikiPage) {
+    public WikiPage rename(@RequestBody WikiPage wikiPage) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
         if (StringUtils.isBlank(wikiPage.getName())) {
-            return DocResponseJson.warn("标题不能为空！");
+//            return DocResponseJson.warn("标题不能为空！");
+            throw new ServiceException("标题不能为空！");
         }
         if (StringUtils.isBlank(wikiPage.getId() + "")) {
-            return DocResponseJson.warn("不能为新建的文档改名！");
+//            return DocResponseJson.warn("不能为新建的文档改名！");
+            throw new ServiceException("不能为新建的文档改名！");
         }
         Long pageId = wikiPage.getId();
         Long spaceId = wikiPage.getSpaceId();
@@ -375,7 +375,8 @@ public class WikiPageController {
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
         String canEdit = wikiPageAuthService.canEdit(wikiSpaceSel, wikiPageSel.getEditType(), wikiPageSel.getId(), currentUser.getUserId());
         if (canEdit != null) {
-            return DocResponseJson.warn(canEdit);
+//            return DocResponseJson.warn(canEdit);
+            throw new ServiceException(canEdit);
         }
         spaceId = wikiPageSel.getSpaceId();
         WikiPage oldWikiPage = wikiPageService.getById(pageId);
@@ -394,13 +395,14 @@ public class WikiPageController {
             // 创建历史记录
             wikiPageHistoryService.saveRecord(spaceId, wikiPage.getId(), pageContent.getContent());
         } catch (ServiceException e) {
-            return DocResponseJson.warn(e.getMessage());
+//            return DocResponseJson.warn(e.getMessage());
+            throw new ServiceException(e.getMessage());
         }
-        return DocResponseJson.ok(wikiPage);
+        return wikiPage;
     }
 
     @PostMapping("/unlock")
-    public ResponseJson<Object> unlock(Long pageId) {
+    public void unlock(Long pageId) {
         String lockKey = CachePrefix.WIKI_LOCK_PAGE + pageId;
         DocUserDetails pageLockUser = CacheUtil.get(lockKey);
         if (pageLockUser != null) {
@@ -410,22 +412,21 @@ public class WikiPageController {
                 CacheUtil.remove(lockKey);
             }
         }
-        return DocResponseJson.ok();
     }
 
     @PostMapping("/lock")
-    public ResponseJson<Object> editLock(Long pageId) {
+    public void editLock(Long pageId) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
         String lockKey = CachePrefix.WIKI_LOCK_PAGE + pageId;
         DocUserDetails pageLockUser = CacheUtil.get(lockKey);
         if (pageLockUser != null) {
             if (!Objects.equals(pageLockUser.getUserId(), currentUser.getUserId())) {
-                return DocResponseJson.warn("当前页面正在被：" + pageLockUser.getUsername() + " 编辑");
+//                return DocResponseJson.warn("当前页面正在被：" + pageLockUser.getUsername() + " 编辑");
+                throw new ServiceException("当前页面正在被：" + pageLockUser.getUsername() + " 编辑");
             }
         }
         CacheUtil.put(lockKey, new DocUserDetails(currentUser.getUserId(), currentUser.getUserName()));
-        return DocResponseJson.ok();
     }
 
     @PostMapping("/searchByEs")
