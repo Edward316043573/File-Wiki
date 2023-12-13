@@ -6,11 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
-import top.cxscoder.wiki.domain.entity.DocEntry;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.wiki.batch.strategy.ConditionalStrategySelector;
 import top.cxscoder.wiki.batch.strategy.comb.ICombDependencyStrategy;
 import top.cxscoder.wiki.batch.strategy.file.IFileStrategy;
-import top.cxscoder.wiki.json.DocResponseJson;
+import top.cxscoder.wiki.domain.entity.DocEntry;
 import top.cxscoder.wiki.domain.entity.WikiPageFile;
 
 import javax.annotation.Resource;
@@ -38,7 +38,7 @@ public class BatchDocImportManager {
      * @author Sh1yu
      * @since 2023年7月13日
      */
-    public DocResponseJson<Object> importBatchDoc(WikiPageFile wikiPageFile, MultipartFile file) {
+    public void importBatchDoc(WikiPageFile wikiPageFile, MultipartFile file) {
         String suffix = FileUtil.getSuffix(file.getOriginalFilename());
         try {
             IFileStrategy strategy = conditionalStrategySelector.getStrategy(suffix, IFileStrategy.class);
@@ -46,7 +46,8 @@ public class BatchDocImportManager {
                 if (log.isInfoEnabled()) {
                     log.info("暂时不支持{}格式文件的导入", suffix);
                 }
-                return DocResponseJson.error("暂时不支持" + suffix + "格式文件的导入");
+//                return DocResponseJson.error("暂时不支持" + suffix + "格式文件的导入");
+                throw new ServiceException("暂时不支持" + suffix + "格式文件的导入");
             }
             if (log.isInfoEnabled()) {
                 log.info("文档导入的格式为{}，选择的策略为{}", suffix, strategy.getClass().getName());
@@ -54,9 +55,9 @@ public class BatchDocImportManager {
             strategy.file(uploadPath, wikiPageFile, file);
         } catch (Exception e) {
             log.warn("导入文件发生错误：{}", e.getMessage());
-            return DocResponseJson.warn("导入文件发生错误！");
+//            return DocResponseJson.warn("导入文件发生错误！");
+            throw new ServiceException("导入文件发生错误！");
         }
-        return DocResponseJson.ok();
     }
 
     /**

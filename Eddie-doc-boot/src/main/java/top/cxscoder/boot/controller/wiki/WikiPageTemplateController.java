@@ -10,12 +10,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.domain.dto.WikiTemplateFilterDTO;
-import top.cxscoder.wiki.json.DocResponseJson;
-import top.cxscoder.wiki.json.ResponseJson;
 import top.cxscoder.wiki.domain.entity.WikiPage;
 import top.cxscoder.wiki.domain.entity.WikiPageContent;
 import top.cxscoder.wiki.domain.entity.WikiPageFile;
@@ -94,7 +93,7 @@ public class WikiPageTemplateController {
     }
 
     @PostMapping("/use")
-    public ResponseJson<Object> use(Long spaceId, Long parentId, String templateId) {
+    public Object use(Long spaceId, Long parentId, String templateId) {
         WikiPageTemplate template = wikiPageTemplateService.getById(templateId);
         WikiPage wikiTemplatePage = wikiPageService.getById(template.getPageId());
         WikiPage wikiPage = new WikiPage();
@@ -122,11 +121,13 @@ public class WikiPageTemplateController {
                     pageFile.setPageId(((WikiPage)info).getId());
                     wikiPageFileService.save(pageFile);
                 }
-                return DocResponseJson.ok(info);
+//                return DocResponseJson.ok(info);
+                return info;
             }
-            DocResponseJson.warn((String) info);
+//            DocResponseJson.warn((String) info);
+            throw new ServiceException((String) info);
         }
-        return DocResponseJson.ok("状态异常");
+        return "状态异常";
     }
 
 }

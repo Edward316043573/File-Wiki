@@ -5,10 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
@@ -94,8 +91,9 @@ public class WikiPageCommentController {
     }
 
     //	@PreAuthorize("hasAnyAuthority('wiki:comment:delete')")
-    @PostMapping("/delete")
-    public ResponseJson<Object> delete(Long id) {
+    @DeleteMapping("/{id}}")
+    @Transactional
+    public ResponseJson<Object> delete(@PathVariable Long id) {
         WikiPageComment pageCommentSel = wikiPageCommentService.getById(id);
         WikiPage wikiPageSel = wikiPageService.getById(pageCommentSel.getPageId());
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();

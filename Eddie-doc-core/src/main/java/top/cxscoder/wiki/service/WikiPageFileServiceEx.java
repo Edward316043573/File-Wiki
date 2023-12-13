@@ -8,15 +8,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
-import top.cxscoder.wiki.json.DocResponseJson;
+import top.cxscoder.wiki.common.constant.DocSysType;
+import top.cxscoder.wiki.common.constant.UserMsgType;
 import top.cxscoder.wiki.domain.entity.UserMessage;
 import top.cxscoder.wiki.domain.entity.WikiPage;
 import top.cxscoder.wiki.domain.entity.WikiPageFile;
 import top.cxscoder.wiki.domain.entity.WikiSpace;
-import top.cxscoder.wiki.common.constant.DocSysType;
-import top.cxscoder.wiki.common.constant.UserMsgType;
 import top.cxscoder.wiki.service.common.WikiPageAuthService;
 import top.cxscoder.wiki.service.manage.UserMessageService;
 import top.cxscoder.wiki.service.manage.WikiPageFileService;
@@ -86,30 +86,34 @@ public class WikiPageFileServiceEx {
         return null;
     }
     
-    public DocResponseJson<Object> basicUpload(WikiPageFile wikiPageFile, MultipartFile file) {
+    public WikiPageFile basicUpload(WikiPageFile wikiPageFile, MultipartFile file) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
         Long pageId = wikiPageFile.getPageId();
         if (pageId == null || pageId <= 0) {
-            return DocResponseJson.warn("未指定附件关联的文档");
+//            return DocResponseJson.warn("未指定附件关联的文档");
+            throw new ServiceException("未指定附件关联的文档");
         }
         WikiPage wikiPageSel = wikiPageService.getById(pageId);
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
         // 权限判断
         String canUploadFile = wikiPageAuthService.canUploadFile(wikiSpaceSel, wikiPageSel.getId(), currentUser.getUserId());
         if (canUploadFile != null) {
-            return DocResponseJson.warn(canUploadFile);
+//            return DocResponseJson.warn(canUploadFile);
+            throw new ServiceException(canUploadFile);
         }
         String info = this.uploadFile(wikiPageFile, file, 0);
         if (null != info) {
-            return DocResponseJson.warn(info);
+//            return DocResponseJson.warn(info);
+            throw new ServiceException(info);
         }
         // 给相关人发送消息
         UserMessage userMessage = userMessageService.createUserMessage(currentUser, pageId, wikiPageSel.getName(), DocSysType.WIKI, UserMsgType.WIKI_PAGE_UPLOAD);
         userMessage.setAffectUserId(wikiPageSel.getCreateUserId());
         userMessage.setAffectUserName(wikiPageSel.getCreateUserName());
         userMessageService.addWikiMessage(userMessage);
-        return DocResponseJson.ok(wikiPageFile);
+//        return DocResponseJson.ok(wikiPageFile);
+        return wikiPageFile;
     }
 
     /**

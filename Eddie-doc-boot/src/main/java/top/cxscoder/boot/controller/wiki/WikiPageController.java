@@ -164,7 +164,7 @@ public class WikiPageController {
     }
 
     @PostMapping("/changeParent")
-    public ResponseJson<Object> changeParent(WikiPage wikiPage, Integer beforeSeq, Integer afterSeq) {
+    public void changeParent(@RequestBody WikiPage wikiPage, Integer beforeSeq, Integer afterSeq) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
         WikiPage wikiPageSel = wikiPageService.getById(wikiPage.getId());
@@ -172,7 +172,8 @@ public class WikiPageController {
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
         String canEdit = wikiPageAuthService.canEdit(wikiSpaceSel, wikiPageSel.getEditType(), wikiPageSel.getId(), currentUser.getUserId());
         if (canEdit != null) {
-            return DocResponseJson.warn(canEdit);
+//            return DocResponseJson.warn(canEdit);
+            throw new ServiceException(canEdit);
         }
         WikiPage wikiPageUp = new WikiPage();
         wikiPageUp.setId(wikiPage.getId());
@@ -181,7 +182,6 @@ public class WikiPageController {
         wikiPageUp.setUpdateUserId(currentUser.getUserId());
         wikiPageUp.setUpdateUserName(currentUser.getUserName());
         wikiPageService.changeParent(wikiPageUp, beforeSeq, afterSeq);
-        return DocResponseJson.ok();
     }
 
     @DeleteMapping("/delete/{pageId}")
@@ -212,16 +212,18 @@ public class WikiPageController {
     }
 
     @PostMapping("/update")
-    public ResponseJson<Object> update(@RequestBody WikiPageDTO wikiPageDTO) {
+    public Object update(@RequestBody WikiPageDTO wikiPageDTO) {
         WikiPage wikiPage = BeanUtil.copyProperties(wikiPageDTO, WikiPage.class);
         Object info = wikipageUploadService.update(wikiPage, wikiPageDTO.getContent(), wikiPageDTO.getPreview());
         if (null != info) {
             if (info instanceof WikiPage) {
-                return DocResponseJson.ok(info);
+                return info;
             }
-            return DocResponseJson.warn((String) info);
+//            return DocResponseJson.warn((String) info);
+            throw new ServiceException((String)info);
         }
-        return DocResponseJson.warn("状态异常");
+//        return DocResponseJson.warn("状态异常");
+        throw new ServiceException("状态异常");
     }
 
     public boolean isLassoDoll(WikiPage wikiPage, Long moveToPageId) {
@@ -244,9 +246,11 @@ public class WikiPageController {
     }
 
     @PostMapping("/move")
-    public ResponseJson<Object> move(WikiPage wikiPage, Long moveToPageId, Long moveToSpaceId) {
+    @Transactional
+    public void move(@RequestBody WikiPage wikiPage, Long moveToPageId, Long moveToSpaceId) {
         if (isLassoDoll(wikiPage, moveToPageId)) {
-            return DocResponseJson.warn("不能移动自己到自己或自己的子节点下");
+//            return DocResponseJson.warn("不能移动自己到自己或自己的子节点下");
+            throw new ServiceException("不能移动自己到自己或自己的子节点下");
         }
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
@@ -278,7 +282,6 @@ public class WikiPageController {
         // 给相关人发送消息
         UserMessage userMessage = userMessageService.createUserMessage(currentUser, wikiPageSel.getId(), wikiPageSel.getName(), DocSysType.WIKI, UserMsgType.WIKI_PAGE_MOVE);
         userMessageService.addWikiMessage(userMessage);
-        return DocResponseJson.ok();
     }
 
     @PostMapping("/copy")
@@ -432,28 +435,32 @@ public class WikiPageController {
     }
 
     @PostMapping("/download")
-    public ResponseJson<Object> download(Long pageId, HttpServletResponse response) {
+    public void download(Long pageId, HttpServletResponse response) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
         WikiPage wikiPageSel = wikiPageService.getById(pageId);
         // 页面已删除
         if (wikiPageSel == null || Objects.equals(wikiPageSel.getDelFlag(), 1)) {
-            return DocResponseJson.warn("该页面不存在或已删除！");
+//            return DocResponseJson.warn("该页面不存在或已删除！");
+            throw new ServiceException("该页面不存在或已删除！");
         }
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
         // 空间已删除
         if (wikiSpaceSel == null || Objects.equals(wikiSpaceSel.getDelFlag(), 1)) {
-            return DocResponseJson.warn("该页面不存在或已删除！");
+//            return DocResponseJson.warn("该页面不存在或已删除！");
+            throw new ServiceException("该页面不存在或已删除！");
         }
         // 私人空间
         if (SpaceType.isOthersPrivate(wikiSpaceSel.getType(), currentUser.getUserId(), wikiSpaceSel.getCreateUserId())) {
-            return DocResponseJson.warn("您没有权限查看该空间的文章详情！");
+//            return DocResponseJson.warn("您没有权限查看该空间的文章详情！");
+            throw new ServiceException("您没有权限查看该空间的文章详情！");
         }
         UpdateWrapper<WikiPageContent> wrapper = new UpdateWrapper<>();
         wrapper.eq("page_id", pageId);
         WikiPageContent pageContent = wikiPageContentService.getOne(wrapper);
         if (pageContent == null || StringUtils.isBlank(pageContent.getContent())) {
-            return DocResponseJson.warn("文档内容为空，不能导出！");
+//            return DocResponseJson.warn("文档内容为空，不能导出！");
+            throw new ServiceException("您没有权限查看该空间的文章详情！");
         }
         try {
             String content = pageContent.getContent();
@@ -480,12 +487,14 @@ public class WikiPageController {
             XmlUtils.marshaltoString(wordMLPackage.getMainDocumentPart().getJaxbElement(), true, true);
             wordMLPackage.save(outputStream);
             outputStream.close();
-            return DocResponseJson.ok();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return DocResponseJson.warn("导出失败");
+//        return DocResponseJson.warn("导出失败");
+        throw new ServiceException("导出失败");
     }
+
 
     @PostMapping("/news")
     public List<SpaceNewsVo> news(@RequestBody SearchByEsParam param) {

@@ -6,7 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.common.exception.ServiceException;
@@ -19,8 +21,6 @@ import top.cxscoder.wiki.domain.entity.WikiSpace;
 import top.cxscoder.wiki.domain.vo.SpaceNewsVo;
 import top.cxscoder.wiki.domain.vo.WikiPageContentVo;
 import top.cxscoder.wiki.domain.vo.WikiPageVo;
-import top.cxscoder.wiki.json.DocResponseJson;
-import top.cxscoder.wiki.json.ResponseJson;
 import top.cxscoder.wiki.repository.mapper.WikiPageContentMapper;
 import top.cxscoder.wiki.service.manage.WikiPageContentService;
 import top.cxscoder.wiki.service.manage.WikiPageFileService;
@@ -62,10 +62,10 @@ public class WikiOpenApiController {
     }
 
     @PostMapping("/page/news")
-    public ResponseJson<List<WikiPageVo>> news(SearchByEsParam param, String space) {
+    public List<SpaceNewsVo> news(@RequestBody SearchByEsParam param, String space) {
         WikiSpace wikiSpace = this.getWikiSpace(space);
         if (wikiSpace == null) {
-            return DocResponseJson.warn("未找到该文档");
+          throw new ServiceException("未找到该文档");
         }
         String keywords = param.getKeywords();
         if (StringUtils.isNotBlank(keywords)) {
@@ -95,21 +95,21 @@ public class WikiOpenApiController {
                 val.setPageTitle(pageTitle);
             });
         }
-        return DocResponseJson.ok(spaceNewsVoList);
+        return spaceNewsVoList;
     }
 
     @PostMapping("/page/list")
-    public ResponseJson<List<WikiPageVo>> list(String space) {
+    public List<WikiPageVo> list(String space) {
         WikiSpace wikiSpace = this.getWikiSpace(space);
         if (wikiSpace == null) {
-            return DocResponseJson.warn("未找到该文档");
+           throw new ServiceException("未找到该文档");
         }
         QueryWrapper<WikiPage> wrapper = new QueryWrapper<>();
         wrapper.eq("del_flag", 0);
         wrapper.eq("space_id", wikiSpace.getId());
         List<WikiPage> wikiPageList = wikiPageService.list(wrapper);
         if (CollectionUtils.isEmpty(wikiPageList)) {
-            return DocResponseJson.ok();
+            return null;
         }
         Map<Long, List<WikiPageVo>> listMap = wikiPageList.stream().map(WikiPageVo::new).collect(Collectors.groupingBy(WikiPageVo::getParentId));
         List<WikiPageVo> nodePageList = listMap.get(0L);
@@ -117,19 +117,20 @@ public class WikiOpenApiController {
             nodePageList = nodePageList.stream().sorted(Comparator.comparingInt(WikiPageVo::getSeqNo)).collect(Collectors.toList());
             this.setChildren(listMap, nodePageList);
         }
-        return DocResponseJson.ok(nodePageList);
+        return nodePageList;
     }
 
     @PostMapping("/page/detail")
-    public ResponseJson<WikiPageContentVo> detail(String space, Long pageId) {
+    @Transactional
+    public WikiPageContentVo  detail(String space, Long pageId) {
         WikiSpace wikiSpace = this.getWikiSpace(space);
         if (wikiSpace == null) {
-            return DocResponseJson.warn("未找到该文档");
+            throw new ServiceException("未找到该文档");
         }
         WikiPage wikiPageSel = wikiPageService.getById(pageId);
         // 不存在或不属于该空间
         if (wikiPageSel == null || !Objects.equals(wikiPageSel.getSpaceId(), wikiSpace.getId())) {
-            return DocResponseJson.warn("未找到该文档");
+            throw new ServiceException("未找到该文档");
         }
         UpdateWrapper<WikiPageContent> wrapper = new UpdateWrapper<>();
         wrapper.eq("page_id", pageId);
@@ -153,7 +154,7 @@ public class WikiOpenApiController {
         vo.setWikiPage(wikiPageSel);
         vo.setPageContent(pageContent);
         vo.setFileList(pageFiles);
-        return DocResponseJson.ok(vo);
+        return vo;
     }
 
     private void setChildren(Map<Long, List<WikiPageVo>> listMap, List<WikiPageVo> nodePageList) {

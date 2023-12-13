@@ -6,13 +6,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
-import top.cxscoder.system.security.LoginUser;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.anotation.AuthMan;
 import top.cxscoder.wiki.domain.entity.WikiPage;
@@ -81,8 +79,7 @@ public class WikiPageHistoryController {
 		if (wikiPageHistory == null) {
 			throw new ServiceException("未找到相关记录");
 		}
-		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		User currentUser = loginUser.getUser();
+		User currentUser = loginService.getCurrentUser();
 		WikiPage wikiPageSel = wikiPageService.getById(wikiPageHistory.getPageId());
 		WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
 		// 私人空间

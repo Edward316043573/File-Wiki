@@ -6,19 +6,20 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
+import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.common.constant.DocSysModuleType;
 import top.cxscoder.wiki.common.constant.DocSysType;
 import top.cxscoder.wiki.common.constant.UserMsgType;
 import top.cxscoder.wiki.domain.entity.*;
 import top.cxscoder.wiki.domain.vo.UserPageAuthVo;
 import top.cxscoder.wiki.framework.consts.WikiAuthType;
-import top.cxscoder.wiki.json.DocResponseJson;
-import top.cxscoder.wiki.json.ResponseJson;
 import top.cxscoder.wiki.repository.mapper.UserGroupAuthMapper;
 import top.cxscoder.wiki.security.DocUserUtil;
 import top.cxscoder.wiki.security.UserAuthInfo;
@@ -51,17 +52,19 @@ public class WikiPageAuthController {
     private final WikiPageAuthService wikiPageAuthService;
     private final UserMessageService userMessageService;
     private final UserGroupAuthMapper userGroupAuthMapper;
+    private final LoginService loginService;
 
     @PostMapping("/assign")
+    @Transactional
     //todo authList 权限列表
-    public ResponseJson<List<WikiPageZan>> assign(Long pageId, String authList) {
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = loginUser.getUser();
+    public void assign(Long pageId, String authList) {
+        User currentUser = loginService.getCurrentUser();
         WikiPage wikiPageSel = wikiPageService.getById(pageId);
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
         String canConfigAuth = wikiPageAuthService.canConfigAuth(wikiSpaceSel, pageId, currentUser.getUserId());
         if (canConfigAuth != null) {
-            return DocResponseJson.warn(canConfigAuth);
+//            return DocResponseJson.warn(canConfigAuth);
+            throw new ServiceException(canConfigAuth);
         }
         List<String> authNameList = Stream.of(WikiAuthType.values()).map(WikiAuthType::getCode).collect(Collectors.toList());
         QueryWrapper<AuthInfo> queryWrapper = new QueryWrapper<>();
@@ -114,23 +117,24 @@ public class WikiPageAuthController {
             List<UserAuthInfo> userAuthListNew = userAuthService.getUserAuthSet(authVo.getUserId());
             DocUserUtil.setUserAuth(authVo.getUserId(), userAuthListNew);
         }
-        return DocResponseJson.ok();
     }
 
     @PostMapping("/list")
-    public ResponseJson<Object> list(Long pageId) {
+    public List<UserPageAuthVo> list(Long pageId) {
         LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User currentUser = loginUser.getUser();
         WikiPage wikiPageSel = wikiPageService.getById(pageId);
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
         String canConfigAuth = wikiPageAuthService.canConfigAuth(wikiSpaceSel, pageId, currentUser.getUserId());
         if (canConfigAuth != null) {
-            return DocResponseJson.warn(canConfigAuth);
+//            return DocResponseJson.warn(canConfigAuth);
+            throw new ServiceException(canConfigAuth);
         }
+
         //todo 查询模块权限
         List<UserAuth> authList = userAuthService.getModuleAuthList(DocSysType.WIKI.getType(), DocSysModuleType.Wiki.PAGE.getType(), pageId);
         if (CollectionUtils.isEmpty(authList)) {
-            return DocResponseJson.ok();
+            return null;
         }
         // 权限ID对应的权限名
         Collection<AuthInfo> authInfoList = authInfoService.listByIds(authList.stream().map(UserAuth::getAuthId).collect(Collectors.toSet()));
@@ -153,7 +157,7 @@ public class WikiPageAuthController {
             authVo.setUserName(userInfoMap.get(key));
             authVoList.add(authVo);
         });
-        return DocResponseJson.ok(authVoList);
+        return authVoList;
     }
 
     private Integer haveAuth(Set<String> authNameSet, WikiAuthType wikiAuthType) {

@@ -4,17 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.domain.dto.MessageDTO;
 import top.cxscoder.wiki.domain.entity.UserMessage;
-import top.cxscoder.wiki.security.DocUserDetails;
-import top.cxscoder.wiki.security.DocUserUtil;
 import top.cxscoder.wiki.service.manage.UserMessageService;
 
 import javax.annotation.Resource;
@@ -75,8 +70,8 @@ public class UserMessageController {
 	 * @param ids 消息IDS
 	 * @return 是否成功
 	 */
-	@PostMapping("/delete")
-	public boolean delete(String ids) {
+	@DeleteMapping ("/{ids}}")
+	public boolean delete(@PathVariable String ids) {
 		return this.update(ids, 2);
 	}
 	
@@ -90,7 +85,7 @@ public class UserMessageController {
 		if (StringUtils.isBlank(ids)) {
 			throw new ServiceException("没有要删除的消息");
 		}
-		DocUserDetails currentUser = DocUserUtil.getCurrentUser();
+		User currentUser = loginService.getCurrentUser();
 		QueryWrapper<UserMessage> wrapper = new QueryWrapper<>();
 		wrapper.in("id", Arrays.asList(ids.split(",")));
 		wrapper.eq("accept_user_id", currentUser.getUserId());

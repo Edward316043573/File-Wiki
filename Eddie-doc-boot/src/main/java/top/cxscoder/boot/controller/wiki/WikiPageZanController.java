@@ -3,14 +3,14 @@ package top.cxscoder.boot.controller.wiki;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
-import top.cxscoder.system.security.LoginUser;
+import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.anotation.AuthMan;
 import top.cxscoder.wiki.common.constant.DocSysType;
 import top.cxscoder.wiki.common.constant.UserMsgType;
@@ -45,12 +45,11 @@ public class WikiPageZanController {
     private final WikiPageService wikiPageService;
     private final UserMessageService userMessageService;
 
+    private final LoginService loginService;
+
     @PostMapping("/list")
     public List<WikiPageZan> list(@RequestBody WikiPageZan wikiPageZan) {
-
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-         User currentUser = loginUser.getUser();
+        User currentUser = loginService.getCurrentUser();
         WikiPage wikiPageSel = wikiPageService.getById(wikiPageZan.getPageId());
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
         // 私人空间
@@ -66,9 +65,9 @@ public class WikiPageZanController {
     }
 
     @PostMapping("/update")
+    @Transactional
     public void update(@RequestBody WikiPageZan wikiPageZan) {
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = loginUser.getUser();
+        User currentUser = loginService.getCurrentUser();
         Long id = wikiPageZan.getId();
         Long pageId;
         if (id != null && id > 0) {
