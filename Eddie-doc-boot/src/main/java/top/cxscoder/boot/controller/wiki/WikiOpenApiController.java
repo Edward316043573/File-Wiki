@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.domain.SearchByEsParam;
 import top.cxscoder.wiki.domain.entity.WikiPage;
@@ -52,12 +53,12 @@ public class WikiOpenApiController {
     LoginService loginService;
 
     @PostMapping("/space/info")
-    public ResponseJson<WikiSpace> spaceInfo(String space) {
+    public WikiSpace spaceInfo(String space) {
         WikiSpace wikiSpace = this.getWikiSpace(space);
         if (wikiSpace == null) {
-            return DocResponseJson.warn("未找到该文档");
+            throw new ServiceException("未找到该文档");
         }
-        return DocResponseJson.ok(wikiSpace);
+        return wikiSpace;
     }
 
     @PostMapping("/page/news")

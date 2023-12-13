@@ -1,5 +1,6 @@
 package top.cxscoder.boot.controller.wiki;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.IdUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -13,10 +14,8 @@ import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.AltChunkType;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
@@ -24,6 +23,7 @@ import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.common.constant.DocSysType;
 import top.cxscoder.wiki.common.constant.UserMsgType;
 import top.cxscoder.wiki.domain.SearchByEsParam;
+import top.cxscoder.wiki.domain.dto.WikiPageDTO;
 import top.cxscoder.wiki.domain.entity.*;
 import top.cxscoder.wiki.domain.vo.SpaceNewsVo;
 import top.cxscoder.wiki.domain.vo.WikiPageContentVo;
@@ -100,22 +100,23 @@ public class WikiPageController {
 
 //    @PreAuthorize("hasAnyAuthority('wiki:page:detail')")
     @PostMapping("/detail")
-    public ResponseJson<WikiPageContentVo> detail(WikiPage wikiPage) {
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = loginUser.getUser();
+    public WikiPageContentVo detail(@RequestBody WikiPage wikiPage) {
+        User currentUser = loginService.getCurrentUser();
+        // TODO 加缓存提高速度
         WikiPage wikiPageSel = wikiPageService.getById(wikiPage.getId());
         // 页面已删除
         if (wikiPageSel == null || Objects.equals(wikiPageSel.getDelFlag(), 1)) {
-            return DocResponseJson.warn("该页面不存在或已删除！");
+            throw new ServiceException("该页面不存在或已删除！");
         }
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
         // 空间已删除
+        // 加缓存提高速度
         if (wikiSpaceSel == null || Objects.equals(wikiSpaceSel.getDelFlag(), 1)) {
-            return DocResponseJson.warn("该页面不存在或已删除！");
+            throw new ServiceException("该页面不存在或已删除！");
         }
         // 私人空间
         if (SpaceType.isOthersPrivate(wikiSpaceSel.getType(), currentUser.getUserId(), wikiSpaceSel.getCreateUserId())) {
-            return DocResponseJson.warn("您没有权限查看该空间的文章详情！");
+            throw new ServiceException("您没有权限查看该空间的文章详情！");
         }
         LambdaQueryWrapper<WikiPageContent> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(WikiPageContent::getPageId, wikiPage.getId());
@@ -127,7 +128,7 @@ public class WikiPageController {
         wrapperFile.eq(WikiPageFile::getFileSource, PageFileSource.UPLOAD_FILES.getSource());
         List<WikiPageFile> pageFiles = wikiPageFileService.list(wrapperFile);
         for (WikiPageFile pageFile : pageFiles) {
-            pageFile.setFileUrl("zyplayer-doc-wiki/common/file?uuid=" + pageFile.getUuid());
+            pageFile.setFileUrl("wiki/common/file?uuid=" + pageFile.getUuid());
         }
         LambdaQueryWrapper<WikiPageZan> wrapperZan = new LambdaQueryWrapper<>();
         wrapperZan.eq(WikiPageZan::getPageId, wikiPage.getId());
@@ -159,7 +160,7 @@ public class WikiPageController {
         wikiPageService.updateById(wikiPageUp);
         // 修改返回值里的查看数+1
         wikiPageSel.setViewNum(viewNum + 1);
-        return DocResponseJson.ok(vo);
+        return vo;
     }
 
     @PostMapping("/changeParent")
@@ -183,16 +184,17 @@ public class WikiPageController {
         return DocResponseJson.ok();
     }
 
-    @PostMapping("/delete")
-    public ResponseJson<Object> delete(Long pageId) {
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = loginUser.getUser();
+    @DeleteMapping("/delete/{pageId}")
+    @Transactional
+    public void delete(@PathVariable Long pageId) {
+        User currentUser = loginService.getCurrentUser();
         WikiPage wikiPageSel = wikiPageService.getById(pageId);
         // 删除权限判断
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
+        // TODO 权限管理
         String canDelete = wikiPageAuthService.canDelete(wikiSpaceSel, wikiPageSel.getEditType(), wikiPageSel.getId(), currentUser.getUserId());
         if (canDelete != null) {
-            return DocResponseJson.warn(canDelete);
+            throw new ServiceException(canDelete);
         }
         // 执行删除
         WikiPage wikiPage = new WikiPage();
@@ -207,12 +209,12 @@ public class WikiPageController {
         queryWrapper.eq("space_id", wikiPageSel.getSpaceId());
         queryWrapper.eq("page_id", wikiPageSel.getId());
         wikiPageTemplateService.remove(queryWrapper);
-        return DocResponseJson.ok();
     }
 
     @PostMapping("/update")
-    public ResponseJson<Object> update(WikiPage wikiPage, String content, String preview) {
-        Object info = wikipageUploadService.update(wikiPage, content, preview);
+    public ResponseJson<Object> update(@RequestBody WikiPageDTO wikiPageDTO) {
+        WikiPage wikiPage = BeanUtil.copyProperties(wikiPageDTO, WikiPage.class);
+        Object info = wikipageUploadService.update(wikiPage, wikiPageDTO.getContent(), wikiPageDTO.getPreview());
         if (null != info) {
             if (info instanceof WikiPage) {
                 return DocResponseJson.ok(info);

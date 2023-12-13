@@ -1,6 +1,5 @@
 package top.cxscoder.system.security;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,9 +11,8 @@ import top.cxscoder.common.cache.RedisCache;
 import top.cxscoder.common.enums.UserStatus;
 import top.cxscoder.common.exception.UnauthorizedException;
 import top.cxscoder.system.domain.entity.Menu;
-import top.cxscoder.system.services.MenuService;
-import top.cxscoder.system.services.impl.PermissionServiceImpl;
 import top.cxscoder.system.domain.entity.User;
+import top.cxscoder.system.services.MenuService;
 import top.cxscoder.system.services.UserService;
 
 import javax.annotation.Resource;
