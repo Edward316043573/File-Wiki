@@ -7,12 +7,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.anotation.AuthMan;
+import top.cxscoder.wiki.domain.dto.WikiPageHistoryDTO;
 import top.cxscoder.wiki.domain.entity.WikiPage;
 import top.cxscoder.wiki.domain.entity.WikiPageHistory;
 import top.cxscoder.wiki.domain.entity.WikiSpace;
@@ -46,9 +48,9 @@ public class WikiPageHistoryController {
 	private LoginService loginService;
 
 	@PostMapping("/list")
-	public IPage<WikiPageHistory> list( Long pageId, Integer pageNum) {
+	public IPage<WikiPageHistory> list(@RequestBody WikiPageHistoryDTO param) {
 		User currentUser = loginService.getCurrentUser();
-		WikiPage wikiPageSel = wikiPageService.getById(pageId);
+		WikiPage wikiPageSel = wikiPageService.getById(param.getPageId());
 		// 私人空间
 		if (wikiPageSel == null || Objects.equals(wikiPageSel.getDelFlag(), 1)) {
 			return null;
@@ -63,12 +65,12 @@ public class WikiPageHistoryController {
 			throw new ServiceException("您没有权限查看该空间的文章详情！");
 		}
 		LambdaQueryWrapper<WikiPageHistory> wrapper = new LambdaQueryWrapper<>();
-		wrapper.eq(WikiPageHistory::getPageId, pageId);
+		wrapper.eq(WikiPageHistory::getPageId, param.getPageId());
 		wrapper.eq(WikiPageHistory::getDelFlag, 0);
 		wrapper.orderByDesc(WikiPageHistory::getId);
 		wrapper.select(WikiPageHistory::getId, WikiPageHistory::getCreateUserId, WikiPageHistory::getCreateUserName
 				, WikiPageHistory::getPageId, WikiPageHistory::getCreateTime);
-		IPage<WikiPageHistory> page = new Page<>(pageNum, 30, false);
+		IPage<WikiPageHistory> page = new Page<>(param.getPage(), 30, false);
 		wikiPageHistoryService.page(page, wrapper);
 		return page;
 	}

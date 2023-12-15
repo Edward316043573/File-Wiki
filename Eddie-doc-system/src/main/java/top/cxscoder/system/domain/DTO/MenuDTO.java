@@ -7,22 +7,17 @@ import top.cxscoder.system.domain.VO.PageVo;
 
 /**
  * @author Edward
- * @date 2023-12-06 11:43
+ * @date 2023-12-15 17:28
  * @copyright Copyright (c) 2023 Edward
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserDTO extends PageVo {
-    /** 用户账号 */
-    private String userName;
+public class MenuDTO extends PageVo {
 
-    /** 手机号码 */
-    private String phonenumber;
+    /** 菜单名称 */
+    private String menuName;
 
-    /** 用户邮箱 */
-    private String email;
-
-    /** 帐号状态（0正常 1停用） */
+    /** 菜单状态（0正常 1停用） */
     private String status;
 }

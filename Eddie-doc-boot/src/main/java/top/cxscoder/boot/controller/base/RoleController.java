@@ -1,14 +1,16 @@
 package top.cxscoder.boot.controller.base;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import top.cxscoder.common.exception.ServiceException;
-import top.cxscoder.system.services.LoginService;
 import top.cxscoder.system.domain.DTO.RoleDTO;
 import top.cxscoder.system.domain.entity.Role;
+import top.cxscoder.system.services.LoginService;
 import top.cxscoder.system.services.RoleService;
 
 import javax.annotation.Resource;
@@ -33,9 +35,13 @@ public class RoleController {
      * 获取角色列表
      */
     @PreAuthorize("hasAnyAuthority('system:role:list')")
-    @GetMapping("/list")
-    public IPage<Role> list(RoleDTO roleDTO)
+    @PostMapping("/list")
+    public IPage<Role> list(@RequestBody RoleDTO roleDTO)
     {
+        LambdaQueryWrapper<Role> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(!ObjectUtils.isEmpty(roleDTO.getRoleName()),Role::getRoleName,roleDTO.getRoleName());
+        queryWrapper.like(!ObjectUtils.isEmpty(roleDTO.getRoleKey()),Role::getRoleKey,roleDTO.getRoleKey());
+        queryWrapper.eq(!ObjectUtils.isEmpty(roleDTO.getStatus()),Role::getStatus,roleDTO.getStatus());
         return roleService.page(new Page<>(roleDTO.getPage(), roleDTO.getPageSize()));
     }
 

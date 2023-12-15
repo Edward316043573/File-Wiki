@@ -56,8 +56,7 @@ public class WikiPageCommentController {
     //	@PreAuthorize("hasAnyAuthority('wiki:comment:list')")
     @PostMapping("/list")
     public List<WikiPageComment> list(@RequestBody WikiPageComment pageComment) {
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = loginUser.getUser();
+        User currentUser = loginService.getCurrentUser();
         WikiPage wikiPageSel = wikiPageService.getById(pageComment.getPageId());
         // 页面已删除
         if (wikiPageSel == null || Objects.equals(wikiPageSel.getDelFlag(), 1)) {

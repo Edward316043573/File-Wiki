@@ -1,16 +1,19 @@
 package top.cxscoder.boot.controller.base;
 
+import cn.hutool.core.bean.BeanUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import top.cxscoder.common.exception.ServiceException;
-import top.cxscoder.system.services.LoginService;
+import top.cxscoder.system.domain.DTO.MenuDTO;
 import top.cxscoder.system.domain.entity.Menu;
+import top.cxscoder.system.services.LoginService;
 import top.cxscoder.system.services.MenuService;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * 菜单信息
@@ -45,11 +48,12 @@ public class MenuController {
      * 获取菜单列表
      */
     @PreAuthorize("hasAnyAuthority('system:menu:list')")
-    @GetMapping("/list")
-    public List<Menu> list(Menu menu)
+    @PostMapping("/list")
+    public IPage<Menu> list(@RequestBody MenuDTO menuDTO)
     {
-        List<Menu> menus = menuService.selectMenuList(menu, loginService.getLoginUserId());
-        return menus;
+        Menu menu = BeanUtil.copyProperties(menuDTO, Menu.class);
+        Page<Menu> menuPage = new Page<>(menuDTO.getPage(), menuDTO.getPageSize());
+        return menuService.selectMenuList(menu, loginService.getLoginUserId(),menuPage);
     }
 
     /**

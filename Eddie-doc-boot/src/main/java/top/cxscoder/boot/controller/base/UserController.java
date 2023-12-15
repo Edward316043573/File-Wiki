@@ -1,5 +1,6 @@
 package top.cxscoder.boot.controller.base;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.ArrayUtils;
@@ -43,17 +44,22 @@ public class UserController {
      * 获取用户列表
      */
     @PreAuthorize("hasAnyAuthority('system:user:list')")
-    @GetMapping("/list")
-    public IPage<User> list(UserDTO userDTO)
+    @PostMapping("/list")
+    public IPage<User> list(@RequestBody UserDTO userDTO)
     {
-        return userService.page(new Page<>(userDTO.getPage(), userDTO.getPageSize()));
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.like(!ObjectUtils.isEmpty(userDTO.getUserName()),User::getUserName,userDTO.getUserName());
+        queryWrapper.eq(!ObjectUtils.isEmpty(userDTO.getEmail()),User::getEmail,userDTO.getEmail());
+        queryWrapper.eq(!ObjectUtils.isEmpty(userDTO.getPhonenumber()),User::getPhonenumber,userDTO.getPhonenumber());
+        queryWrapper.eq(!ObjectUtils.isEmpty(userDTO.getStatus()),User::getStatus,userDTO.getStatus());
+        return userService.page(new Page<>(userDTO.getPage(), userDTO.getPageSize()),queryWrapper);
     }
 
     /**
      * 根据用户编号获取详细信息
      */
     @PreAuthorize("hasAnyAuthority('system:user:query')")
-    @GetMapping(value = { "/", "/{userId}" })
+    @GetMapping(value = {  "/{userId}" })
     public User getInfo(@PathVariable(value = "userId", required = false) Long userId)
     {
         return userService.getById(userId);
