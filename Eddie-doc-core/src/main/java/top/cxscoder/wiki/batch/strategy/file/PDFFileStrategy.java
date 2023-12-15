@@ -54,9 +54,11 @@ public class PDFFileStrategy implements IFileStrategy {
         wikiPage.setSpaceId(spaceId);
         wikiPage.setParentId(id);
         wikiPage.setEditorType(2);
-
         String filePath = uploadPath + File.separator + fileName;
         File dest = new File(filePath);
+        if (!dest.getParentFile().exists()) {
+            dest.getParentFile().mkdirs();
+        }
         file.transferTo(dest);
         RandomAccessFile is = new RandomAccessFile(dest, "r");
         PDFParser parser = new PDFParser(is);
