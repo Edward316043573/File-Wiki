@@ -15,7 +15,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 import top.cxscoder.common.cache.RedisCache;
 import top.cxscoder.common.constant.RedisConstant;
-import top.cxscoder.common.exception.ServiceException;
+import top.cxscoder.common.exception.UnauthorizedException;
 import top.cxscoder.system.security.LoginUser;
 
 import javax.servlet.FilterChain;
@@ -62,14 +62,14 @@ public class JwtAuthenticationTokenFilter extends OncePerRequestFilter {
             JWTValidator.of(token).validateAlgorithm(JWTSignerUtil.hs256(userId.getBytes())).validateDate();
         } catch (Exception e) {
             e.printStackTrace();
-            throw new ServiceException("token非法");
+            throw new UnauthorizedException("token非法");
             // 响应前端
         }
         //从redis中获取用户信息
         String redisKey = RedisConstant.LOGIN_KEY_PREFIX + userId;
         LoginUser loginUser = redisCache.getCacheObject(redisKey);
         if(Objects.isNull(loginUser)){
-            throw new RuntimeException("用户未登录");
+            throw new UnauthorizedException("用户未登录");
         }
         //存入SecurityContextHolder
         //获取权限信息封装到Authentication中

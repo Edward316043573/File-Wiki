@@ -25,7 +25,7 @@ import java.util.Map;
 public class AccessDeniedHandlerImpl implements AccessDeniedHandler {
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        ResponseResult<Map<String, Object>> result = ResponseResult.error("你没有权限访问这个功能", WebUtils.buildResponseBody(accessDeniedException.getMessage(), request));
+        ResponseResult<Map<String, Object>> result = ResponseResult.noAccessError("你没有权限访问这个功能", WebUtils.buildResponseBody(accessDeniedException.getMessage(), request));
         WebUtils.renderString(response,JSON.toJSONString(result));
     }
 }

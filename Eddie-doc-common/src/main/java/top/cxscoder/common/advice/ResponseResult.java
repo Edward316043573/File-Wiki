@@ -30,6 +30,10 @@ public class ResponseResult<T> implements Serializable {
     protected static final int AUTHORIZED_ERROR_CODE = 401;
 
     /**
+     * 403 权限不足
+     */
+    protected static final int ACCESS_DENIEND_CODE = 403;
+    /**
      * 成功
      */
     protected static final String SUCCESS_MSG = "SUCCESS";
@@ -79,5 +83,9 @@ public class ResponseResult<T> implements Serializable {
 
     public static <T> ResponseResult<T> authorizedError(String message, T data) {
         return new ResponseResult<>(AUTHORIZED_ERROR_CODE, message, data);
+    }
+
+    public static <T> ResponseResult<T> noAccessError(String message, T data) {
+        return new ResponseResult<>(ACCESS_DENIEND_CODE, message, data);
     }
 }

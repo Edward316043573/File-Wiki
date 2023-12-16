@@ -1,6 +1,5 @@
 package top.cxscoder.system.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,7 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import top.cxscoder.system.security.filter.ExceptionHandlerFilter;
 import top.cxscoder.system.security.filter.JwtAuthenticationTokenFilter;
+
+import javax.annotation.Resource;
 
 
 /**
@@ -28,13 +31,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     /**
      * token认证过滤器
      */
-    @Autowired
+    @Resource
     private JwtAuthenticationTokenFilter jwtAuthenticationTokenFilter;
 
-    @Autowired
+    @Resource
+    private ExceptionHandlerFilter exceptionHandlerFilter;
+    @Resource
     private AuthenticationEntryPoint authenticationEntryPoint;
 
-    @Autowired
+    @Resource
     private AccessDeniedHandler accessDeniedHandler;
 
 
@@ -76,7 +81,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 退出登录处理器关闭，否则会和自定义的logout接口冲突
         http.logout().disable();
         //添加过滤器
-        http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                        .addFilterBefore(exceptionHandlerFilter, LogoutFilter.class);
 
         //配置异常处理器
         http.exceptionHandling()
