@@ -1,8 +1,6 @@
 package top.cxscoder.system.services.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -13,7 +11,6 @@ import top.cxscoder.system.services.MenuService;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author Edward
@@ -34,9 +31,9 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
      * @return 菜单列表
      */
     @Override
-    public IPage<Menu> selectMenuList(Menu menu, Long loginUserId, Page<Menu> menuPage) {
+    public List<Menu> selectMenuList(Menu menu, Long loginUserId) {
 
-        IPage<Menu> menuList = null;
+        List<Menu> menuList = null;
         LambdaQueryWrapper<Menu> queryWrapper = new LambdaQueryWrapper<>();
 
         // 管理员显示所有菜单信息
@@ -46,24 +43,21 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
             queryWrapper.eq(!ObjectUtils.isEmpty(menu.getVisible()),Menu::getVisible,menu.getVisible())
                     .eq(!ObjectUtils.isEmpty(menu.getStatus()),Menu::getStatus,menu.getStatus())
                     .like(!ObjectUtils.isEmpty(menu.getMenuName()),Menu::getMenuName,menu.getMenuName());
-            menuList = menuMapper.selectPage(menuPage, queryWrapper);
+            menuList = menuMapper.selectList(queryWrapper);
         }
         else
         {
             // 非管理员查对应的菜单
             menu.getParams().put("userId", loginUserId);
-            List<Menu> allMenuList = menuMapper.selectMenuListByUserId(menu);
-            List<Menu> collect = allMenuList.stream().skip((menuPage.getCurrent() - 1) * menuPage.getSize()).limit(menuPage.getSize()).collect(Collectors.toList());
-            menuList.setTotal(allMenuList.size());
-            menuList.setRecords(collect);
+            menuList = menuMapper.selectMenuListByUserId(menu);
         }
         return menuList;
     }
 
 
     @Override
-    public IPage<Menu> selectMenuList(Long loginUserId) {
-        return selectMenuList(new Menu(),loginUserId,new Page<>(1,9999));
+    public List<Menu> selectMenuList(Long loginUserId) {
+        return selectMenuList(new Menu(),loginUserId);
     }
 
 
@@ -101,8 +95,6 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     public boolean checkMenuExistRole(Long menuId) {
         return menuMapper.checkMenuExistRole(menuId) > 0;
     }
-
-
 
 
 }

@@ -57,7 +57,7 @@ public class WikiPageFileController {
 	}
 	
 	@PostMapping("/import/upload")
-	public void importUpload(@RequestBody WikiPageFile wikiPageFile, @RequestParam("files") MultipartFile file) {
+	public void importUpload(WikiPageFile wikiPageFile, @RequestParam("files") MultipartFile file) {
 		batchDocImportManger.importBatchDoc(wikiPageFile, file);
 	}
 	

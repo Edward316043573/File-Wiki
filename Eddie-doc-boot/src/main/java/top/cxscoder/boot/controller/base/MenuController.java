@@ -1,8 +1,6 @@
 package top.cxscoder.boot.controller.base;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -14,6 +12,7 @@ import top.cxscoder.system.services.LoginService;
 import top.cxscoder.system.services.MenuService;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * 菜单信息
@@ -49,11 +48,10 @@ public class MenuController {
      */
     @PreAuthorize("hasAnyAuthority('system:menu:list')")
     @PostMapping("/list")
-    public IPage<Menu> list(@RequestBody MenuDTO menuDTO)
+    public List<Menu> list(@RequestBody MenuDTO menuDTO)
     {
         Menu menu = BeanUtil.copyProperties(menuDTO, Menu.class);
-        Page<Menu> menuPage = new Page<>(menuDTO.getPage(), menuDTO.getPageSize());
-        return menuService.selectMenuList(menu, loginService.getLoginUserId(),menuPage);
+        return menuService.selectMenuList(menu, loginService.getLoginUserId());
     }
 
     /**

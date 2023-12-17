@@ -1,9 +1,9 @@
 package top.cxscoder.system.services;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.cxscoder.system.domain.entity.Menu;
+
+import java.util.List;
 
 /**
  * @author Edward
@@ -11,9 +11,9 @@ import top.cxscoder.system.domain.entity.Menu;
  * @copyright Copyright (c) 2023 Edward
  */
 public interface MenuService extends IService<Menu> {
-    IPage<Menu> selectMenuList(Menu menu, Long loginUserId, Page<Menu> menuPage);
+    List<Menu> selectMenuList(Menu menu, Long loginUserId);
 
-    IPage<Menu> selectMenuList(Long loginUserId);
+    List<Menu> selectMenuList(Long loginUserId);
 
     /**
      * 检查菜单名字是否唯一

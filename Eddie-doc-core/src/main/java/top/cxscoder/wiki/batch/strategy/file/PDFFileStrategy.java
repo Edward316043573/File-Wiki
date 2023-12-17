@@ -62,9 +62,11 @@ public class PDFFileStrategy implements IFileStrategy {
         file.transferTo(dest);
         RandomAccessFile is = new RandomAccessFile(dest, "r");
         PDFParser parser = new PDFParser(is);
+        // TODO 效率慢
         parser.parse();
         PDDocument doc = parser.getPDDocument();
         PDFTextStripper textStripper = new PDFTextStripper();
+        // TODO 效率慢
         String context = textStripper.getText(doc);
         wikipageUploadService.update(wikiPage, context, context);
     }
