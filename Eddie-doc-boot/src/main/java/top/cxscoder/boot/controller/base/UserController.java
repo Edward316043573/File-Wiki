@@ -65,28 +65,16 @@ public class UserController {
         return userService.getById(userId);
     }
 
+
+
     /**
      * 新增用户
      */
     @PreAuthorize("hasAnyAuthority('system:user:add')")
     @PostMapping
-    public boolean add(@Validated @RequestBody User user)
+    public boolean add(@Validated @RequestBody UserDTO userDTO)
     {
-        if (!userService.checkUserNameUnique(user))
-        {
-            throw new ServiceException("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
-        }
-        else if (!ObjectUtils.isEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user))
-        {
-            throw new ServiceException("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
-        }
-        else if (!ObjectUtils.isEmpty(user.getEmail()) && !userService.checkEmailUnique(user))
-        {
-            throw new ServiceException("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-        }
-        user.setCreateBy(loginService.getUsername());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return userService.save(user);
+        return userService.addUser(userDTO);
     }
 
     /**
