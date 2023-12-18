@@ -18,9 +18,9 @@ import javax.annotation.PostConstruct;
 public class CheckWikiFileSavePath {
 	private static final Logger logger = LoggerFactory.getLogger(CheckWikiFileSavePath.class);
 	
-	@Value("${zyplayer.doc.wiki.upload-path:}")
+	@Value("${wiki.upload-path:}")
 	private String uploadPath;
-	@Value("${zyplayer.doc.wiki.upload-path-check:true}")
+	@Value("${wiki.upload-path-check:true}")
 	private Boolean uploadPathCheck;
 	
 	@PostConstruct

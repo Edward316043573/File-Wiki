@@ -5,15 +5,15 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/Eddie-wiki?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://192.168.245.129:3306/Eddie-wiki?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
-    password: 1234
+    password: '!QAZ2wsx'
 
 
   # redis 配置
   redis:
     # 地址
-    host: localhost
+    host: 192.168.245.129
     # 端口，默认为6379
     port: 6379
     # 数据库索引
@@ -43,3 +43,10 @@ swagger:
   enabled: true
   # 请求前缀
   pathMapping: /dev-api
+
+  # ------WIKI文档相关------
+wiki:
+  # WIKI文档的文件上传后的存储目录，！！截图或文件还是很重要的，建议您还要定期备份此目录的文件呢！！
+  upload-path: ${SERVER_PORT:E:\计算机\项目\file-manage\Eddie-Doc\wiki\wikiFiles}
+  # 是否检查目录有被系统定期清理的风险，强烈建议开启
+  upload-path-check: true

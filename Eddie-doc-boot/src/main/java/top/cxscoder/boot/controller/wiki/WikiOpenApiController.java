@@ -140,7 +140,7 @@ public class WikiOpenApiController {
         wrapperFile.eq("del_flag", 0);
         List<WikiPageFile> pageFiles = wikiPageFileService.list(wrapperFile);
         for (WikiPageFile pageFile : pageFiles) {
-            pageFile.setFileUrl("zyplayer-doc-wiki/common/file?uuid=" + pageFile.getUuid());
+            pageFile.setFileUrl("wiki/common/file?uuid=" + pageFile.getUuid());
         }
         // 高并发下会有覆盖问题，但不重要~
         int viewNum = Optional.ofNullable(wikiPageSel.getViewNum()).orElse(0);
