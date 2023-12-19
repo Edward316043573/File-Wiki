@@ -1,6 +1,7 @@
 package top.cxscoder.system.services;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import top.cxscoder.system.domain.DTO.UserDTO;
 import top.cxscoder.system.domain.entity.User;
 
 /**
@@ -31,4 +32,5 @@ public interface UserService extends IService<User> {
     int updateUserStatus(User user);
 
 
+    boolean addUser(UserDTO userDTO);
 }

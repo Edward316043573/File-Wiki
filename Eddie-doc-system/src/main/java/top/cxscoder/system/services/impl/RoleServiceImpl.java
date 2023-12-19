@@ -1,17 +1,24 @@
 package top.cxscoder.system.services.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import top.cxscoder.common.exception.ServiceException;
+import top.cxscoder.system.domain.DTO.RoleDTO;
 import top.cxscoder.system.domain.entity.Role;
+import top.cxscoder.system.domain.entity.RoleMenu;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.mapper.RoleMapper;
+import top.cxscoder.system.mapper.RoleMenuMapper;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.system.services.RoleService;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,6 +33,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
     @Resource
     RoleMapper roleMapper;
+
+    @Resource
+    private RoleMenuMapper roleMenuMapper;
     @Override
     public void checkRoleDataScope(Long roleId) {
         if (!User.isAdmin(loginService.getLoginUserId()))
@@ -71,5 +81,43 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         {
             throw new ServiceException("不允许操作超级管理员角色");
         }
+    }
+
+    @Override
+    @Transactional
+    public boolean addRole(RoleDTO roleDto) {
+        Role role = BeanUtil.copyProperties(roleDto, Role.class);
+        if (!checkRoleNameUnique(role))
+        {
+            throw new ServiceException("新增角色'" + role.getRoleName() + "'失败，角色名称已存在");
+        }
+        else if (!checkRoleKeyUnique(role))
+        {
+            throw new ServiceException("新增角色'" + role.getRoleName() + "'失败，角色权限已存在");
+        }
+        role.setCreateBy(loginService.getUsername());
+        // 先插入角色信息，获取角色id
+        int result = roleMapper.insert(role);
+        if (result == 0) {
+            throw new ServiceException("插入角色失败");
+        }
+        Long roleId = role.getRoleId();
+        // 再插入角色菜单关联表数据
+        List<Long> menuIds = roleDto.getMenuIds();
+        if (CollectionUtil.isNotEmpty(menuIds)) {
+            List<RoleMenu> roleMenus = new ArrayList<>();
+            for (Long menuId : menuIds) {
+                RoleMenu roleMenu = new RoleMenu();
+                roleMenu.setRoleId(roleId);
+                roleMenu.setMenuId(menuId);
+                roleMenus.add(roleMenu);
+                result =  roleMenuMapper.insert(roleMenu);
+                if (result == 0) {
+                    throw new ServiceException("角色菜单关联表插入失败");
+                }
+            }
+
+        }
+        return true;
     }
 }

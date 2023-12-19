@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import top.cxscoder.system.domain.VO.PageVo;
 
+import java.util.List;
+
 /**
  * @author Edward
  * @date 2023-12-06 19:03
@@ -24,4 +26,6 @@ public class RoleDTO extends PageVo {
     /** 角色状态（0正常 1停用） */
     private String status;
 
+    /**菜单集合*/
+    private List<Long> menuIds;
 }

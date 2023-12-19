@@ -1,18 +1,23 @@
 package top.cxscoder.system.services.impl;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import top.cxscoder.common.exception.ServiceException;
+import top.cxscoder.system.domain.DTO.UserDTO;
 import top.cxscoder.system.domain.entity.User;
+import top.cxscoder.system.domain.entity.UserRole;
 import top.cxscoder.system.mapper.UserMapper;
+import top.cxscoder.system.mapper.UserRoleMapper;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.system.services.UserService;
 
 import javax.annotation.Resource;
 import java.util.List;
-
 /**
  * @author Edward
  * @date 2023-11-30 21:17
@@ -27,6 +32,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Resource
     LoginService loginService;
 
+    @Resource
+    PasswordEncoder passwordEncoder;
+
+    @Resource
+    UserRoleMapper userRoleMapper;
     /**
      * 校验用户是否有数据权限
      *
@@ -104,6 +114,44 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public int updateUserStatus(User user) {
         return userMapper.updateById(user);
+    }
+
+    @Override
+    @Transactional
+    public boolean addUser(UserDTO userDTO) {
+        User user = BeanUtil.copyProperties(userDTO,User.class);
+        if (!checkUserNameUnique(user))
+        {
+            throw new ServiceException("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
+        }
+        else if (!ObjectUtils.isEmpty(user.getPhonenumber()) && !checkPhoneUnique(user))
+        {
+            throw new ServiceException("新增用户'" + user.getUserName() + "'失败，手机号码已存在");
+        }
+        else if (!ObjectUtils.isEmpty(user.getEmail()) && !checkEmailUnique(user))
+        {
+            throw new ServiceException("新增用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+        }
+        user.setCreateBy(loginService.getUsername());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        int result = userMapper.insert(user);
+        if (result == 0){
+            throw new ServiceException("插入用户失败");
+        }
+        Long userId = user.getUserId();
+        Long roleId = userDTO.getRoleId();
+
+        UserRole userRole = new UserRole();
+        userRole.setUserId(userId);
+        userRole.setRoleId(roleId);
+
+        result = userRoleMapper.insert(userRole);
+        if (result == 0){
+            throw new ServiceException("用户角色关联表插入失败");
+        }
+        return true;
+
     }
 
 }
