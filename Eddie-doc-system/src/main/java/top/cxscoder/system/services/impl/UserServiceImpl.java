@@ -138,18 +138,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new ServiceException("插入用户失败");
         }
         Long userId = user.getUserId();
-        Long roleId = user.getRoleId();
-
-        UserRole userRole = new UserRole();
-        userRole.setUserId(userId);
-        userRole.setRoleId(roleId);
-
-        result = userRoleMapper.insert(userRole);
-        if (result == 0){
-            throw new ServiceException("用户角色关联表插入失败");
+        Long[] roleIds = user.getRoleIds();
+        for (Long roleId : roleIds) {
+            UserRole userRole = new UserRole();
+            userRole.setUserId(userId);
+            user.setRoleId(roleId);
+            result = userRoleMapper.insert(userRole);
+            if (result == 0){
+                throw new ServiceException("用户角色关联表插入失败");
+            }
         }
         return true;
-
     }
-
 }
