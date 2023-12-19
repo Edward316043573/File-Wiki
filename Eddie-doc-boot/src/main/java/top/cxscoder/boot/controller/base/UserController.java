@@ -15,7 +15,6 @@ import top.cxscoder.system.domain.DTO.UserDTO;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.domain.entity.UserRole;
 import top.cxscoder.system.services.LoginService;
-import top.cxscoder.system.services.RoleService;
 import top.cxscoder.system.services.UserRoleService;
 import top.cxscoder.system.services.UserService;
 
@@ -34,9 +33,6 @@ import java.util.List;
 public class UserController {
     @Resource
     UserService userService;
-
-    @Resource
-    RoleService roleService;
 
     @Resource
     private LoginService loginService;
@@ -59,11 +55,12 @@ public class UserController {
         queryWrapper.eq(!ObjectUtils.isEmpty(userDTO.getPhonenumber()),User::getPhonenumber,userDTO.getPhonenumber());
         queryWrapper.eq(!ObjectUtils.isEmpty(userDTO.getStatus()),User::getStatus,userDTO.getStatus());
         Page<User> page = userService.page(new Page<>(userDTO.getPage(), userDTO.getPageSize()), queryWrapper);
-        page.getRecords().stream() .forEach(u -> {
+         page.getRecords().stream().peek(u -> {
             //查数据
+             u.setPassword("");
             Long userId = u.getUserId();
             LambdaQueryWrapper<UserRole> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(UserRole::getUserId,userId);
+            wrapper.eq(UserRole::getUserId, userId);
             List<UserRole> userRoles = userRoleService.list(wrapper);
             List<Long> roleIds = new ArrayList<>();
             for (UserRole userRole : userRoles) {
@@ -127,7 +124,7 @@ public class UserController {
     /**
      * 删除用户
      */
-    @PreAuthorize("hasAnyAuthority('system:user:remove')")
+//    @PreAuthorize("hasAnyAuthority('system:user:remove')")
     @DeleteMapping("/{userIds}")
     public boolean remove(@PathVariable Long[] userIds)
     {
@@ -135,7 +132,7 @@ public class UserController {
         {
             throw new ServiceException("当前用户不能删除");
         }
-        return userService.removeBatchByIds(Arrays.asList(userIds));
+        return userService.removeUsersWithRole(Arrays.asList(userIds));
     }
 
     /**

@@ -10,13 +10,14 @@ import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.Role;
 import top.cxscoder.system.domain.entity.RoleMenu;
 import top.cxscoder.system.domain.entity.User;
+import top.cxscoder.system.domain.entity.UserRole;
 import top.cxscoder.system.mapper.RoleMapper;
 import top.cxscoder.system.mapper.RoleMenuMapper;
+import top.cxscoder.system.mapper.UserRoleMapper;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.system.services.RoleService;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,6 +33,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
     @Resource
     RoleMapper roleMapper;
+
+    @Resource
+    UserRoleMapper userRoleMapper;
 
     @Resource
     private RoleMenuMapper roleMenuMapper;
@@ -104,18 +108,42 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         // 再插入角色菜单关联表数据
         List<Long> menuIds = Arrays.asList(role.getMenuIds());
         if (CollectionUtil.isNotEmpty(menuIds)) {
-            List<RoleMenu> roleMenus = new ArrayList<>();
             for (Long menuId : menuIds) {
                 RoleMenu roleMenu = new RoleMenu();
                 roleMenu.setRoleId(roleId);
                 roleMenu.setMenuId(menuId);
-                roleMenus.add(roleMenu);
                 result =  roleMenuMapper.insert(roleMenu);
                 if (result == 0) {
                     throw new ServiceException("角色菜单关联表插入失败");
                 }
             }
 
+        }
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean removeRoleWithMenu(List<Long> asList) {
+        for (Long roleId : asList) {
+            LambdaQueryWrapper<UserRole> wrapper = new LambdaQueryWrapper();
+            wrapper.eq(UserRole::getRoleId,roleId);
+            List<UserRole> userRoles = userRoleMapper.selectList(wrapper);
+            if (!userRoles.isEmpty()){
+                throw new ServiceException("所选角色下有关联用户不能删除");
+            }
+        }
+        boolean b = removeBatchByIds(asList);
+        if (!b){
+            throw new ServiceException("删除角色失败");
+        }
+        for (Long roleId : asList) {
+            LambdaQueryWrapper<RoleMenu> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(RoleMenu::getRoleId,roleId);
+            int res = roleMenuMapper.delete(wrapper);
+            if (res == 0){
+                throw new ServiceException("删除关联表失败");
+            }
         }
         return true;
     }

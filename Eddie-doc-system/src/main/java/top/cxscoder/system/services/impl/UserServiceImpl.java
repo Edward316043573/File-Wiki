@@ -142,10 +142,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         for (Long roleId : roleIds) {
             UserRole userRole = new UserRole();
             userRole.setUserId(userId);
-            user.setRoleId(roleId);
+            userRole.setRoleId(roleId);
             result = userRoleMapper.insert(userRole);
             if (result == 0){
                 throw new ServiceException("用户角色关联表插入失败");
+            }
+        }
+        return true;
+    }
+
+    @Override
+    @Transactional
+    public boolean removeUsersWithRole(List<Long> asList) {
+        boolean b = removeByIds(asList);
+        if (!b){
+            throw new ServiceException("删除用户失败");
+        }
+        for (Long userId : asList) {
+            LambdaQueryWrapper<UserRole> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(UserRole::getUserId,userId);
+            int res = userRoleMapper.delete(wrapper);
+            if (res == 0){
+                throw new ServiceException("删除关联表失败");
             }
         }
         return true;

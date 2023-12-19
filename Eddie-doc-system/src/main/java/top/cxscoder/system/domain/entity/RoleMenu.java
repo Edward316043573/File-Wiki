@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@TableName("sys_role_menu")
 public class RoleMenu {
     /** 角色ID */
     private Long roleId;

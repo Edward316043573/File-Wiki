@@ -1,11 +1,16 @@
 package top.cxscoder.system.domain.DTO;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import top.cxscoder.system.domain.VO.PageVo;
+import top.cxscoder.system.domain.entity.Role;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author Edward
@@ -16,6 +21,8 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO extends PageVo {
+    /** 用户ID */
+    @TableId(value = "user_id", type = IdType.AUTO)
     private Long userId;
 
     /** 部门ID */
@@ -54,6 +61,20 @@ public class UserDTO extends PageVo {
     /** 最后登录时间 */
     private Date loginDate;
 
-    /** 角色id*/
+    /** 角色对象 */
+    @TableField(exist = false)
+    private List<Role> roles;
+
+    /** 角色组 */
+    @TableField(exist = false)
+    private Long[] roleIds;
+
+    /** 岗位组 */
+    @TableField(exist = false)
+    private Long[] postIds;
+
+    /** 角色ID */
+    @TableField(exist = false)
     private Long roleId;
+
 }

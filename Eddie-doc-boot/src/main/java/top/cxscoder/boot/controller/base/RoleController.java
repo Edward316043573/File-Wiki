@@ -29,6 +29,7 @@ public class RoleController {
     @Resource
     RoleService roleService;
 
+
     @Resource
     LoginService loginService;
 
@@ -61,7 +62,7 @@ public class RoleController {
     /**
      * 新增角色
      */
-    @PreAuthorize("hasAnyAuthority('system:role:add')")
+//    @PreAuthorize("hasAnyAuthority('system:role:add')")
     @PostMapping
     public boolean add(@Validated @RequestBody RoleDTO roleDto)
     {
@@ -125,10 +126,10 @@ public class RoleController {
     /**
      * 删除角色
      */
-    @PreAuthorize("hasAnyAuthority('system:role:remove')")
+//    @PreAuthorize("hasAnyAuthority('system:role:remove')")
     @DeleteMapping("/{roleIds}")
     public boolean remove(@PathVariable Long[] roleIds)
     {
-        return roleService.removeBatchByIds(Arrays.asList(roleIds));
+        return roleService.removeRoleWithMenu(Arrays.asList(roleIds));
     }
 }

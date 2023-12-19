@@ -3,6 +3,8 @@ package top.cxscoder.system.services;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.cxscoder.system.domain.entity.Role;
 
+import java.util.List;
+
 /**
  * @author Edward
  * @date 2023-11-30 16:56
@@ -18,4 +20,6 @@ public interface RoleService extends IService<Role> {
     void checkRoleAllowed(Role role);
 
     boolean addRole(Role role);
+
+    boolean removeRoleWithMenu(List<Long> asList);
 }

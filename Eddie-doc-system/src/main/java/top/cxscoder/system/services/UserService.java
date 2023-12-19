@@ -3,6 +3,8 @@ package top.cxscoder.system.services;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.cxscoder.system.domain.entity.User;
 
+import java.util.List;
+
 /**
  * @author Edward
  * @date 2023-11-30 16:55
@@ -32,4 +34,6 @@ public interface UserService extends IService<User> {
 
 
     boolean addUser(User user);
+
+    boolean removeUsersWithRole(List<Long> asList);
 }
