@@ -1,5 +1,6 @@
 package top.cxscoder.system.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@TableName("sys_user_role")
+
 public class UserRole {
     /** 用户ID */
     private Long userId;

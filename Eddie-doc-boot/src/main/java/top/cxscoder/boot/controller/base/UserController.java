@@ -13,12 +13,16 @@ import org.springframework.web.bind.annotation.*;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.DTO.UserDTO;
 import top.cxscoder.system.domain.entity.User;
+import top.cxscoder.system.domain.entity.UserRole;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.system.services.RoleService;
+import top.cxscoder.system.services.UserRoleService;
 import top.cxscoder.system.services.UserService;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Edward
@@ -40,7 +44,8 @@ public class UserController {
     @Resource
     PasswordEncoder passwordEncoder;
 
-
+    @Resource
+    UserRoleService userRoleService;
     /**
      * 获取用户列表
      */
@@ -53,7 +58,21 @@ public class UserController {
         queryWrapper.eq(!ObjectUtils.isEmpty(userDTO.getEmail()),User::getEmail,userDTO.getEmail());
         queryWrapper.eq(!ObjectUtils.isEmpty(userDTO.getPhonenumber()),User::getPhonenumber,userDTO.getPhonenumber());
         queryWrapper.eq(!ObjectUtils.isEmpty(userDTO.getStatus()),User::getStatus,userDTO.getStatus());
-        return userService.page(new Page<>(userDTO.getPage(), userDTO.getPageSize()),queryWrapper);
+        Page<User> page = userService.page(new Page<>(userDTO.getPage(), userDTO.getPageSize()), queryWrapper);
+        page.getRecords().stream() .forEach(u -> {
+            //查数据
+            Long userId = u.getUserId();
+            LambdaQueryWrapper<UserRole> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(UserRole::getUserId,userId);
+            List<UserRole> userRoles = userRoleService.list(wrapper);
+            List<Long> roleIds = new ArrayList<>();
+            for (UserRole userRole : userRoles) {
+                roleIds.add(userRole.getRoleId());
+            }
+            Long[] ids = (Long[]) roleIds.toArray();
+            u.setRoleIds(ids);
+        });
+        return page;
     }
 
     /**
