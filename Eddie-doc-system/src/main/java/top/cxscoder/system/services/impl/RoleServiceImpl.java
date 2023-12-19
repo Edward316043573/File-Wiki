@@ -1,6 +1,5 @@
 package top.cxscoder.system.services.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -8,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import top.cxscoder.common.exception.ServiceException;
-import top.cxscoder.system.domain.DTO.RoleDTO;
 import top.cxscoder.system.domain.entity.Role;
 import top.cxscoder.system.domain.entity.RoleMenu;
 import top.cxscoder.system.domain.entity.User;
@@ -19,6 +17,7 @@ import top.cxscoder.system.services.RoleService;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -85,8 +84,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
     @Override
     @Transactional
-    public boolean addRole(RoleDTO roleDto) {
-        Role role = BeanUtil.copyProperties(roleDto, Role.class);
+    public boolean addRole(Role role) {
+
         if (!checkRoleNameUnique(role))
         {
             throw new ServiceException("新增角色'" + role.getRoleName() + "'失败，角色名称已存在");
@@ -103,7 +102,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         }
         Long roleId = role.getRoleId();
         // 再插入角色菜单关联表数据
-        List<Long> menuIds = roleDto.getMenuIds();
+        List<Long> menuIds = Arrays.asList(role.getMenuIds());
         if (CollectionUtil.isNotEmpty(menuIds)) {
             List<RoleMenu> roleMenus = new ArrayList<>();
             for (Long menuId : menuIds) {

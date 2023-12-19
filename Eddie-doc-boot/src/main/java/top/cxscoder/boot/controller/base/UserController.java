@@ -1,5 +1,6 @@
 package top.cxscoder.boot.controller.base;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -74,7 +75,8 @@ public class UserController {
     @PostMapping
     public boolean add(@Validated @RequestBody UserDTO userDTO)
     {
-        return userService.addUser(userDTO);
+        User user = BeanUtil.copyProperties(userDTO,User.class);
+        return userService.addUser(user);
     }
 
     /**

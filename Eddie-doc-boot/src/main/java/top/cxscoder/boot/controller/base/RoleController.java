@@ -1,5 +1,6 @@
 package top.cxscoder.boot.controller.base;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -64,7 +65,8 @@ public class RoleController {
     @PostMapping
     public boolean add(@Validated @RequestBody RoleDTO roleDto)
     {
-        return roleService.addRole(roleDto);
+        Role role = BeanUtil.copyProperties(roleDto, Role.class);
+        return roleService.addRole(role);
 
     }
 

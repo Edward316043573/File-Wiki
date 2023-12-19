@@ -1,6 +1,5 @@
 package top.cxscoder.system.services.impl;
 
-import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -8,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import top.cxscoder.common.exception.ServiceException;
-import top.cxscoder.system.domain.DTO.UserDTO;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.domain.entity.UserRole;
 import top.cxscoder.system.mapper.UserMapper;
@@ -118,8 +116,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @Transactional
-    public boolean addUser(UserDTO userDTO) {
-        User user = BeanUtil.copyProperties(userDTO,User.class);
+    public boolean addUser(User user) {
+
         if (!checkUserNameUnique(user))
         {
             throw new ServiceException("新增用户'" + user.getUserName() + "'失败，登录账号已存在");
@@ -140,7 +138,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new ServiceException("插入用户失败");
         }
         Long userId = user.getUserId();
-        Long roleId = userDTO.getRoleId();
+        Long roleId = user.getRoleId();
 
         UserRole userRole = new UserRole();
         userRole.setUserId(userId);
