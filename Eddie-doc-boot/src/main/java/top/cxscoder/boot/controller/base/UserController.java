@@ -100,25 +100,11 @@ public class UserController {
      */
     @PreAuthorize("hasAnyAuthority('system:user:edit')")
     @PutMapping
-    public boolean edit(@Validated @RequestBody User user)
+    public boolean edit(@Validated @RequestBody UserDTO userDTO)
     {
-        userService.checkUserAllowed(user);
-        userService.checkUserDataScope(user.getUserId());
-        // TODO 这个校验需要考虑下 当前的BUG是用户只有一个也会报存在，如果改条件又会和新增的逻辑不符合
-        if (!userService.checkUserNameUnique(user))
-        {
-            throw new ServiceException("修改用户'" + user.getUserName() + "'失败，登录账号已存在");
-        }
-        else if (!ObjectUtils.isEmpty(user.getPhonenumber()) && !userService.checkPhoneUnique(user))
-        {
-            throw new ServiceException("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
-        }
-        else if (!ObjectUtils.isEmpty(user.getEmail()) && !userService.checkEmailUnique(user))
-        {
-            throw new ServiceException("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
-        }
-        user.setUpdateBy(loginService.getUsername());
-        return userService.updateById(user);
+        User user = BeanUtil.copyProperties(userDTO,User.class);
+
+        return userService.updateUserWithRole(user);
     }
 
     /**

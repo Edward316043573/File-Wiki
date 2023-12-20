@@ -29,7 +29,7 @@ import java.util.List;
 @Service
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements RoleService {
     @Resource
-    LoginService loginService;
+     LoginService loginService;
 
     @Resource
     RoleMapper roleMapper;
@@ -147,4 +147,50 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         }
         return true;
     }
+
+    @Override
+    @Transactional
+    public boolean updateWithMenu(Role role) {
+       checkRoleAllowed(role);
+       checkRoleDataScope(role.getRoleId());
+        if (!checkRoleNameUnique(role))
+        {
+            throw new ServiceException("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");
+        }
+        else if (!checkRoleKeyUnique(role))
+        {
+            throw new ServiceException("修改角色'" + role.getRoleName() + "'失败，角色权限已存在");
+        }
+        role.setUpdateBy(loginService.getUsername());
+        updateById(role);
+        LambdaQueryWrapper<RoleMenu> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(RoleMenu::getRoleId,role.getRoleId());
+        roleMenuMapper.delete(wrapper);
+        Long roleId = role.getRoleId();
+        List<Long> menuIds = Arrays.asList(role.getMenuIds());
+        if (CollectionUtil.isNotEmpty(menuIds)) {
+            for (Long menuId : menuIds) {
+                RoleMenu roleMenu = new RoleMenu();
+                roleMenu.setRoleId(roleId);
+                roleMenu.setMenuId(menuId);
+                int result =  roleMenuMapper.insert(roleMenu);
+                if (result == 0) {
+                    throw new ServiceException("修改角色'" + role.getRoleName() + "'失败，请联系管理员");
+                }
+            }
+        }
+
+            // 更新缓存用户权限
+//            LoginUser loginUser = getLoginUser();
+//            if (StringUtils.isNotNull(loginUser.getUser()) && !loginUser.getUser().isAdmin())
+//            {
+//                loginUser.setPermissions(permissionService.getMenuPermission(loginUser.getUser()));
+//                loginUser.setUser(userService.selectUserByUserName(loginUser.getUser().getUserName()));
+//                tokenService.setLoginUser(loginUser);
+//            }
+//            return success();
+            return true;
+    }
+
+
 }

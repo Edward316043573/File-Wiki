@@ -22,4 +22,7 @@ public interface RoleService extends IService<Role> {
     boolean addRole(Role role);
 
     boolean removeRoleWithMenu(List<Long> asList);
+
+    boolean updateWithMenu(Role role
+    );
 }

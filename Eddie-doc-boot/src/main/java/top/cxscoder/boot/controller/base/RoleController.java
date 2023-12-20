@@ -8,7 +8,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.DTO.RoleDTO;
 import top.cxscoder.system.domain.entity.Role;
 import top.cxscoder.system.services.LoginService;
@@ -93,34 +92,11 @@ public class RoleController {
      */
     @PreAuthorize("hasAnyAuthority('system:role:edit')")
     @PutMapping
-    public boolean edit(@Validated @RequestBody Role role)
+    public boolean edit(@Validated @RequestBody RoleDTO roleDto)
     {
-        roleService.checkRoleAllowed(role);
-        roleService.checkRoleDataScope(role.getRoleId());
-        if (!roleService.checkRoleNameUnique(role))
-        {
-            throw new ServiceException("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");
-        }
-        else if (!roleService.checkRoleKeyUnique(role))
-        {
-            throw new ServiceException("修改角色'" + role.getRoleName() + "'失败，角色权限已存在");
-        }
-        role.setUpdateBy(loginService.getUsername());
+        Role role = BeanUtil.copyProperties(roleDto, Role.class);
+        return roleService.updateWithMenu(role);
 
-        if (roleService.updateById(role))
-        {
-            // 更新缓存用户权限
-//            LoginUser loginUser = getLoginUser();
-//            if (StringUtils.isNotNull(loginUser.getUser()) && !loginUser.getUser().isAdmin())
-//            {
-//                loginUser.setPermissions(permissionService.getMenuPermission(loginUser.getUser()));
-//                loginUser.setUser(userService.selectUserByUserName(loginUser.getUser().getUserName()));
-//                tokenService.setLoginUser(loginUser);
-//            }
-//            return success();
-            return true;
-        }
-        throw new ServiceException("修改角色'" + role.getRoleName() + "'失败，请联系管理员");
     }
 
     /**

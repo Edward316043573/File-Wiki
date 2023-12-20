@@ -36,4 +36,6 @@ public interface UserService extends IService<User> {
     boolean addUser(User user);
 
     boolean removeUsersWithRole(List<Long> asList);
+
+    boolean updateUserWithRole(User user);
 }

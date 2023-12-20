@@ -168,4 +168,42 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         return true;
     }
+
+    @Override
+    @Transactional
+    public boolean updateUserWithRole(User user) {
+       checkUserAllowed(user);
+       checkUserDataScope(user.getUserId());
+        // TODO 这个校验需要考虑下 当前的BUG是用户只有一个也会报存在，如果改条件又会和新增的逻辑不符合
+        if (!checkUserNameUnique(user))
+        {
+            throw new ServiceException("修改用户'" + user.getUserName() + "'失败，登录账号已存在");
+        }
+        else if (!ObjectUtils.isEmpty(user.getPhonenumber()) && !checkPhoneUnique(user))
+        {
+            throw new ServiceException("修改用户'" + user.getUserName() + "'失败，手机号码已存在");
+        }
+        else if (!ObjectUtils.isEmpty(user.getEmail()) && !checkEmailUnique(user))
+        {
+            throw new ServiceException("修改用户'" + user.getUserName() + "'失败，邮箱账号已存在");
+        }
+        user.setUpdateBy(loginService.getUsername());
+        updateById(user);
+        //更新关联表
+        LambdaQueryWrapper<UserRole> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(UserRole::getUserId,user.getUserId());
+        userRoleMapper.delete(queryWrapper);
+        Long userId = user.getUserId();
+        Long[] roleIds = user.getRoleIds();
+        for (Long roleId : roleIds) {
+            UserRole userRole = new UserRole();
+            userRole.setUserId(userId);
+            userRole.setRoleId(roleId);
+            int result = userRoleMapper.insert(userRole);
+            if (result == 0){
+                throw new ServiceException("用户角色关联表更新 失败");
+            }
+        }
+        return true;
+    }
 }
