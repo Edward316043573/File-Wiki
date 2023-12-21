@@ -65,7 +65,7 @@ public class loginServiceImpl implements LoginService {
 
 
     @Override
-    public Map<String,String> Login(String username, String password, String code) {
+    public Map<String,String> login(String username, String password, String code) {
         // TODO 验证验证码
 
         // TODO 预检验

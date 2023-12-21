@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public interface LoginService {
 
-    Map<String,String> Login(String username, String password, String code);
+    Map<String,String> login(String username, String password, String code);
 
     void logout();
 

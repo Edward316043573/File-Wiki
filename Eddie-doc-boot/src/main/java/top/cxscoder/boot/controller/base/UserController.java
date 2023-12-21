@@ -22,6 +22,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Edward
@@ -45,7 +46,7 @@ public class UserController {
     /**
      * 获取用户列表
      */
-    @PreAuthorize("hasAnyAuthority('system:user:list')")
+//    @PreAuthorize("hasAnyAuthority('system:user:list')")
     @PostMapping("/list")
     public IPage<User> list(@RequestBody UserDTO userDTO)
     {
@@ -55,9 +56,9 @@ public class UserController {
         queryWrapper.eq(!ObjectUtils.isEmpty(userDTO.getPhonenumber()),User::getPhonenumber,userDTO.getPhonenumber());
         queryWrapper.eq(!ObjectUtils.isEmpty(userDTO.getStatus()),User::getStatus,userDTO.getStatus());
         Page<User> page = userService.page(new Page<>(userDTO.getPage(), userDTO.getPageSize()), queryWrapper);
-         page.getRecords().stream().peek(u -> {
-            //查数据
-             u.setPassword("");
+        List<User> updatedUsers = page.getRecords().stream().map(u -> {
+            // 查数据
+            u.setPassword("");
             Long userId = u.getUserId();
             LambdaQueryWrapper<UserRole> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(UserRole::getUserId, userId);
@@ -66,9 +67,11 @@ public class UserController {
             for (UserRole userRole : userRoles) {
                 roleIds.add(userRole.getRoleId());
             }
-            Long[] ids = (Long[]) roleIds.toArray();
+            Long[] ids = roleIds.toArray(new Long[0]);
             u.setRoleIds(ids);
-        });
+            return u;
+        }).collect(Collectors.toList());
+        page.setRecords(updatedUsers);
         return page;
     }
 
@@ -87,7 +90,7 @@ public class UserController {
     /**
      * 新增用户
      */
-    @PreAuthorize("hasAnyAuthority('system:user:add')")
+//    @PreAuthorize("hasAnyAuthority('system:user:add')")
     @PostMapping
     public boolean add(@Validated @RequestBody UserDTO userDTO)
     {

@@ -68,7 +68,7 @@ public class MenuController {
     /**
      * 新增菜单
      */
-    @PreAuthorize("hasAnyAuthority('system:menu:add')")
+//    @PreAuthorize("hasAnyAuthority('system:menu:add')")
     @PostMapping
     public boolean add(@Validated @RequestBody Menu menu)
     {
@@ -111,7 +111,7 @@ public class MenuController {
     /**
      * 删除菜单
      */
-    @PreAuthorize("hasAnyAuthority('system:menu:remove')")
+//    @PreAuthorize("hasAnyAuthority('system:menu:remove')")
     @DeleteMapping("/{menuId}")
     public boolean remove(@PathVariable("menuId") Long menuId)
     {

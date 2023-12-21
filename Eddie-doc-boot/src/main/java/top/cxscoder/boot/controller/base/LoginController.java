@@ -24,7 +24,7 @@ public class LoginController {
     @ApiOperation("登录接口")
     @PostMapping("/login")
     public Map<String,String> login(@RequestBody LoginDTO loginDTO) {
-        return loginService.Login(loginDTO.getUsername(), loginDTO.getPassword(), loginDTO.getCode());
+        return loginService.login(loginDTO.getUsername(), loginDTO.getPassword(), loginDTO.getCode());
     }
 
     @ApiOperation("登出接口")
