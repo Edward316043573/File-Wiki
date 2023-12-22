@@ -27,7 +27,7 @@ import java.util.ArrayList;
 @Slf4j
 public class BatchDocImportManager {
 
-    @Value("${zyplayer.doc.wiki.upload-path:}")
+    @Value("${wiki.upload-path:}")
     private String uploadPath;
     @Resource
     ConditionalStrategySelector conditionalStrategySelector;
