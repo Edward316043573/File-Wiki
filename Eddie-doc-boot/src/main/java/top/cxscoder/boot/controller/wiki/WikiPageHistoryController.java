@@ -6,16 +6,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.anotation.AuthMan;
 import top.cxscoder.wiki.domain.dto.WikiPageHistoryDTO;
 import top.cxscoder.wiki.domain.entity.WikiPage;
+import top.cxscoder.wiki.domain.entity.WikiPageContent;
 import top.cxscoder.wiki.domain.entity.WikiPageHistory;
 import top.cxscoder.wiki.domain.entity.WikiSpace;
 import top.cxscoder.wiki.framework.consts.SpaceType;
@@ -75,8 +73,8 @@ public class WikiPageHistoryController {
 		return page;
 	}
 	
-	@PostMapping("/detail")
-	public String detail(Long id) {
+	@PostMapping("/detail/{id}")
+	public WikiPageContent detail(@PathVariable Long id) {
 		WikiPageHistory wikiPageHistory = wikiPageHistoryService.getById(id);
 		if (wikiPageHistory == null) {
 			throw new ServiceException("未找到相关记录");
@@ -90,7 +88,9 @@ public class WikiPageHistoryController {
 		}
 		try {
 			byte[] bytes = ZipUtil.unGzip(wikiPageHistory.getContent());
-			return new String(bytes, StandardCharsets.UTF_8);
+			WikiPageContent wikiPageContent = new WikiPageContent();
+			wikiPageContent.setContent(new String(bytes, StandardCharsets.UTF_8));
+			return wikiPageContent;
 		} catch (Exception e) {
 			log.error("解析文档内容失败", e);
 			throw new ServiceException("解析文档内容失败：" + e.getMessage());
