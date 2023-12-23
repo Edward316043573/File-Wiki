@@ -31,6 +31,8 @@ public class WikiPageFile implements Serializable {
      */
     private Long pageId;
 
+    private Long spaceId;
+
     /**
      * 文件名
      */

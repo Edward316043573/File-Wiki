@@ -58,7 +58,7 @@ public class WikiPageServiceImpl extends ServiceImpl<WikiPageMapper, WikiPage> i
 		wikiPageMapper.updateChildrenSeq(wikiPageSel.getSpaceId(), wikiPage.getParentId());
 		// 给相关人发送消息
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+		User currentUser = loginUser.getUser();
 		UserMessage userMessage = userMessageService.createUserMessage(currentUser, wikiPageSel.getId(), wikiPageSel.getName(), DocSysType.WIKI, UserMsgType.WIKI_PAGE_PARENT);
 		userMessage.setAffectUserId(wikiPageSel.getCreateUserId());
 		userMessage.setAffectUserName(wikiPageSel.getCreateUserName());
@@ -69,7 +69,7 @@ User currentUser = loginUser.getUser();
 	public void deletePage(WikiPage wikiPage) {
 		// 给相关人发送消息
 		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-User currentUser = loginUser.getUser();
+		User currentUser = loginUser.getUser();
 		UserMessage userMessage = userMessageService.createUserMessage(currentUser, wikiPage.getId(), wikiPage.getName(), DocSysType.WIKI, UserMsgType.WIKI_PAGE_DELETE);
 		userMessage.setAffectUserId(wikiPage.getCreateUserId());
 		userMessage.setAffectUserName(wikiPage.getCreateUserName());

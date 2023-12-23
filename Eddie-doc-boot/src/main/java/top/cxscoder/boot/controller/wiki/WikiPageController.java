@@ -217,10 +217,8 @@ public class WikiPageController {
             if (info instanceof WikiPage) {
                 return info;
             }
-//            return DocResponseJson.warn((String) info);
             throw new ServiceException((String)info);
         }
-//        return DocResponseJson.warn("状态异常");
         throw new ServiceException("状态异常");
     }
 
