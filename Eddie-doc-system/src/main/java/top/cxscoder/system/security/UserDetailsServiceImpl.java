@@ -67,7 +67,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     {
         // 获取当前用户的权限集合
         List<Menu> menus = menuService.selectMenuList(user.getUserId());
+
         Set<String> perms = menus.stream().map(m -> new String(m.getPerms())).collect(Collectors.toSet());
+
         return new LoginUser(user, perms);
     }
 }

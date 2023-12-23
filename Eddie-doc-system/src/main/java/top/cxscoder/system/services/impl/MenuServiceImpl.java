@@ -10,6 +10,7 @@ import top.cxscoder.system.mapper.MenuMapper;
 import top.cxscoder.system.services.MenuService;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -48,6 +49,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
         else
         {
             // 非管理员查对应的菜单
+            menu.setParams(new HashMap<>());
             menu.getParams().put("userId", loginUserId);
             menuList = menuMapper.selectMenuListByUserId(menu);
         }
