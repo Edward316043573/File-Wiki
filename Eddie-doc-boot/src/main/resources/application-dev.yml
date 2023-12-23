@@ -1,13 +1,14 @@
 server:
   port: 8080
 
-
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://192.168.245.129:3306/Eddie-wiki?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&autoReconnect=true&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
     username: root
     password: '!QAZ2wsx'
+
+
 
 
   # redis 配置
@@ -47,6 +48,39 @@ swagger:
   # ------WIKI文档相关------
 wiki:
   # WIKI文档的文件上传后的存储目录，！！截图或文件还是很重要的，建议您还要定期备份此目录的文件呢！！
-  upload-path: ${SERVER_PORT:E:\计算机\项目\file-manage\Eddie-Doc\wiki\wikiFiles}
+  upload-path: ${SERVER_PORT:E:\计算机\项目\file-manage\Eddie-Doc\wikiFiles}
   # 是否检查目录有被系统定期清理的风险，强烈建议开启
   upload-path-check: true
+
+
+deployment:
+  host: 192.168.1.6
+
+filesize-max: 5242880
+
+files:
+  storage: E:\计算机\项目\file-manage\Eddie-Doc\wikiFiles
+  storage.folder: documents
+  docservice:
+    fillforms-docs: .oform|.docx
+    viewed-docs: .pdf|.djvu|.xps|.oxps
+    edited-docs: .docx|.xlsx|.csv|.pptx|.txt|.docxf
+    convert-docs: .docm|.dotx|.dotm|.dot|.doc|.odt|.fodt|.ott|.xlsm|.xlsb|.xltx|.xltm|.xlt|.xls|.ods|.fods|.ots|.pptm|.ppt|.ppsx|.ppsm|.pps|.potx|.potm|.pot|.odp|.fodp|.otp|.rtf|.mht|.html|.htm|.xml|.epub|.fb2
+    timeout: 120000
+    history.postfix: -hist
+    url:
+      site: http://192.168.245.129:8100/
+      converter: ConvertService.ashx
+      command: coauthoring/CommandService.ashx
+      api: web-apps/apps/api/documents/api.js
+      preloader: web-apps/apps/api/documents/cache-scripts.html
+      example:
+    secret: custom_jwt_srcret
+    header: Authorization
+    verify-peer-off: true
+    languages: en:English|hy:Armenian|az:Azerbaijani|eu:Basque|be:Belarusian|bg:Bulgarian|ca:Catalan|zh:Chinese (People's Republic of China)|zh-TW:Chinese (Traditional, Taiwan)|cs:Czech|da:Danish|nl:Dutch|fi:Finnish|fr:French|gl:Galego|de:German|el:Greek|hu:Hungarian|id:Indonesian|it:Italian|ja:Japanese|ko:Korean|lv:Latvian|lo:Lao|ms:Malay (Malaysia)|nb:Norwegian|pl:Polish|pt:Portuguese (Brazil)|pt-PT:Portuguese (Portugal)|ro:Romanian|ru:Russian|sk:Slovak|sl:Slovenian|es:Spanish|sv:Swedish|tr:Turkish|uk:Ukrainian|vi:Vietnamese
+
+logo:
+  image:
+  imageEmbedded:
+  url: https://www.onlyoffice.com

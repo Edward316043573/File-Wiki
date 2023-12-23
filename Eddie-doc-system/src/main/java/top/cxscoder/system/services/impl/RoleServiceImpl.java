@@ -153,14 +153,15 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     public boolean updateWithMenu(Role role) {
        checkRoleAllowed(role);
        checkRoleDataScope(role.getRoleId());
-        if (!checkRoleNameUnique(role))
-        {
-            throw new ServiceException("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");
-        }
-        else if (!checkRoleKeyUnique(role))
-        {
-            throw new ServiceException("修改角色'" + role.getRoleName() + "'失败，角色权限已存在");
-        }
+       // TODO 一样 需要校验
+//        if (!checkRoleNameUnique(role))
+//        {
+//            throw new ServiceException("修改角色'" + role.getRoleName() + "'失败，角色名称已存在");
+//        }
+//        else if (!checkRoleKeyUnique(role))
+//        {
+//            throw new ServiceException("修改角色'" + role.getRoleName() + "'失败，角色权限已存在");
+//        }
         role.setUpdateBy(loginService.getUsername());
         updateById(role);
         LambdaQueryWrapper<RoleMenu> wrapper = new LambdaQueryWrapper<>();

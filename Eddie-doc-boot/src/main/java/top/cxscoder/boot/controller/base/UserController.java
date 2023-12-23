@@ -90,7 +90,7 @@ public class UserController {
     /**
      * 新增用户
      */
-//    @PreAuthorize("hasAnyAuthority('system:user:add')")
+    @PreAuthorize("hasAnyAuthority('system:user:add')")
     @PostMapping
     public boolean add(@Validated @RequestBody UserDTO userDTO)
     {

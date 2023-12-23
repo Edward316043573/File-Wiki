@@ -49,6 +49,7 @@ public class User extends BaseEntity {
     private String avatar;
 
     /** 密码 */
+//    @TableField(value = "password", select = false)
     private String password;
 
     /** 帐号状态（0正常 1停用） */

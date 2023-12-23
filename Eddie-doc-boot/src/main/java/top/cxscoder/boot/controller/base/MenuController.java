@@ -105,7 +105,7 @@ public class MenuController {
         }
         menu.setUpdateBy(loginService.getUsername());
         // TODO 测试更新
-        return menuService.update(menu,null);
+        return menuService.saveOrUpdate(menu);
     }
 
     /**

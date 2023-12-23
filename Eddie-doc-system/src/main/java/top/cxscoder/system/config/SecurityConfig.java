@@ -76,6 +76,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/login", "/register", "/captchaImage").permitAll()
                 .antMatchers("/swagger-ui.html", "/swagger-ui/**","/swagger-resources/**", "/webjars/**", "/*/api-docs", "/druid/**").permitAll()
                 // 除上面外的所有请求全部需要鉴权认证
+//                .anyRequest().authenticated();
                 .anyRequest().permitAll();
 
         // 退出登录处理器关闭，否则会和自定义的logout接口冲突

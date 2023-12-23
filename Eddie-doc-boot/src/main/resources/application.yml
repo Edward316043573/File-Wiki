@@ -2,13 +2,15 @@
 spring:
   profiles:
     active: dev
-
+#logging:
+#  level:
+#    top.cxscoder: debug
 # 公共配置
-logging:
-  config: classpath:logback-spring.xml
+#logging:
+#  config: classpath:logback-spring.xml
 
 mybatis-plus:
   type-aliases-package:
-    - top.cxscoder.system.entity
+    - top.cxscoder.system.domain
     - com.example.entity
-  mapper-locations: classpath:/mapper/*Mapper.xml
+  mapper-locations: classpath*:/mapper/*Mapper.xml
