@@ -1,8 +1,6 @@
 package top.cxscoder.wiki.batch.strategy.file;
 
-import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.util.IdUtil;
-import cn.hutool.core.util.StrUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -25,6 +23,7 @@ import top.cxscoder.wiki.service.manage.WikiSpaceService;
 import java.io.File;
 import java.io.IOException;
 import java.util.Date;
+import java.util.Stack;
 
 /**
  * @author: Wang Jianping
@@ -48,66 +47,54 @@ public class PDFFileStrategy implements IFileStrategy {
     private final WikiPageFileService wikiPageFileService;
     private final LoginService loginService;
     @Override
-    public void file(String uploadPath, WikiPageFile wikiPageFile, MultipartFile file) throws IOException {
-        String fileName = StringUtils.defaultString(file.getOriginalFilename(), "新建文档");
-        //文件类型
-        String type = FileUtil.extName(fileName);
-        //pageId表示文件所在空间的文件夹的id 如果不是文件夹则pageId为0 查询不到对应的文件夹
-        Long pageId = wikiPageFile.getPageId();
-        //查询传入文件所在的父文件夹
-        WikiPage page = wikiPageService.getById(pageId);
-        //获取传入文件的所在空间id
-        //新建wiki 存储到数据库
+    public void file(String uploadPath, WikiPageFile wikiPageFile, MultipartFile file ) throws IOException {
+        // 创建一个 WikiPage对象
+        String originalFilename = file.getOriginalFilename();
+        String fileName = StringUtils.defaultString(originalFilename.substring(0, originalFilename.indexOf(".")), "新建文档");
         WikiPage wikiPage = new WikiPage();
-        wikiPage.setName(fileName.substring(0, fileName.indexOf(".")));
-        //获取传入文件的空间id
-        Long spaceId = wikiPageFile.getId();
-        //传入文件的所在的文件夹id，如果在文件夹外为0，不为0查询父文件夹传入父文件夹的id
-        Long id = wikiPageFile.getPageId();
-        if (null != page) {
-            spaceId = page.getSpaceId();
-            id = page.getId();
-        }
-        WikiSpace space = wikiSpaceService.getById(spaceId);
-        String spaceName = space.getName();
-        String pageName = page.getName();
-        String filePath = uploadPath +File.separator+ spaceName;
-        Long parentId = page.getParentId();
+        wikiPage.setName(fileName);
+        wikiPage.setParentId(wikiPageFile.getPageId());
+        wikiPage.setSpaceId(wikiPageFile.getSpaceId());
+        wikiPage.setEditorType(3);
+        /* 解析PDF内容 */
+        // 1. 找到文件路径 文件路径格式 上传路径/空间ID/页面层次结构
+        WikiSpace wikiSpace = wikiSpaceService.getById(wikiPage.getSpaceId());
+        StringBuffer filePathBuffer = new StringBuffer();
+        filePathBuffer.append(uploadPath).append(File.separator).append(wikiSpace.getName()).append(File.separator);
+        Long parentId = wikiPageFile.getPageId();
+        Stack<String> s = new Stack<>();
         while(parentId != 0 ){
             WikiPage parentPage = wikiPageService.getById(parentId);
             String parentName = parentPage.getName();
-            pageName = parentName + File.separator + pageName ;
+            s.push(parentName);
             parentId = parentPage.getParentId();
         }
-        //拼接空间名称
-        filePath = filePath +File.separator+ pageName;
-        File parentFile = new File(filePath);
-        if (!parentFile.exists()){
-            parentFile.mkdirs();
+        while(!s.isEmpty()) {
+            filePathBuffer.append(s.pop()).append(File.separator);
         }
-        filePath = filePath + File.separator + fileName;
-        wikiPage.setSpaceId(spaceId);
-        wikiPage.setParentId(id);
-        wikiPage.setEditorType(2);
-        String UUID = IdUtil.fastUUID();
-        String fileUUID = UUID + StrUtil.DOT + type;
-        String fileUrl = "http://localhost:8083/wiki/page/file/" + fileUUID;
+        String filePath = filePathBuffer.append(file.getOriginalFilename()).toString();
+        // 2.调用wikipageUploadService.update(wikiPage, context, context);
         File dest = new File(filePath);
+        // 如果文件不存在则创建父目录
+        if (!dest.exists()) {
+            dest.getParentFile().mkdirs();
+        }
         file.transferTo(dest);
         RandomAccessFile is = new RandomAccessFile(dest, "r");
         PDFParser parser = new PDFParser(is);
-        parser.parse();
+        parser.parse(); // TODO 效率低
         PDDocument doc = parser.getPDDocument();
         PDFTextStripper textStripper = new PDFTextStripper();
-        String context = textStripper.getText(doc);
+        String context = textStripper.getText(doc); // TODO 效率低
         wikipageUploadService.update(wikiPage, context, context);
-        //插入wiki_page_file表
+        // 存WikiPageFile
+        String UUID = IdUtil.fastUUID();
         WikiPageFile uploadFile = new WikiPageFile();
         uploadFile.setFileName(fileName);
         uploadFile.setPageId(wikiPage.getId());
-        uploadFile.setSpaceId(spaceId);
-        uploadFile.setFileUrl(fileUrl);
-        uploadFile.setUuid(fileUUID);
+        uploadFile.setSpaceId(wikiPageFile.getId());
+        uploadFile.setFileUrl(filePath);
+        uploadFile.setUuid(UUID);
         User currentUser = loginService.getCurrentUser();
         uploadFile.setCreateUserId(currentUser.getUserId());
         uploadFile.setCreateUserName(currentUser.getUserName());
@@ -119,5 +106,6 @@ public class PDFFileStrategy implements IFileStrategy {
         uploadFile.setFileSize(file.getSize());
         uploadFile.setDownloadNum(0);
         wikiPageFileService.save(uploadFile);
+
     }
 }
