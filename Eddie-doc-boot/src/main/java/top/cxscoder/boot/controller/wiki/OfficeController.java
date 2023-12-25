@@ -63,9 +63,6 @@ public class OfficeController {
                     + port + "/wiki/page/file/preview?"
                     + "userFileId=" + previewOfficeFileDTO.getUserFileId()
                     + "&isMin=false&shareBatchNum=undefined&extractionCode=undefined";
-//            String previewUrl = request.getScheme() + "://" + deploymentHost + "/wiki/page/file/preview?"
-//                    + "userFileId=" + previewOfficeFileDTO.getUserFileId()
-//                    + "&isMin=false&shareBatchNum=undefined&extractionCode=undefined";
             User currentUser = loginService.getCurrentUser();
             WikiPageFile userFile = wikiPageFileService.lambdaQuery().eq(WikiPageFile::getPageId, previewOfficeFileDTO.getUserFileId()).one();
             Action action = Action.view;
