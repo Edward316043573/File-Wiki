@@ -21,14 +21,14 @@ package top.cxscoder.wiki.office.services.configurers.wrappers;
 
 import lombok.Builder;
 import lombok.Getter;
-import top.cxscoder.wiki.domain.entity.WikiPage;
+import top.cxscoder.wiki.domain.entity.WikiPageFile;
 import top.cxscoder.wiki.office.documentserver.models.filemodel.Permission;
 
 @Getter
 @Builder
 public class DefaultDocumentWrapper {
     private Permission permission;
-    private WikiPage userFile;
+    private WikiPageFile userFile;
     private Boolean favorite;
     private String previewUrl;
 }

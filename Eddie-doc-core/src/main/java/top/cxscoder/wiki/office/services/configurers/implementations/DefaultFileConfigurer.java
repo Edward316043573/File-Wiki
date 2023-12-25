@@ -19,12 +19,12 @@
 package top.cxscoder.wiki.office.services.configurers.implementations;
 
 
+import cn.hutool.core.io.FileUtil;
 import org.springframework.beans.factory.ObjectFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import top.cxscoder.wiki.domain.entity.WikiPage;
-import top.cxscoder.wiki.enums.Extends;
+import top.cxscoder.wiki.domain.entity.WikiPageFile;
 import top.cxscoder.wiki.office.documentserver.managers.jwt.JwtManager;
 import top.cxscoder.wiki.office.documentserver.models.enums.Action;
 import top.cxscoder.wiki.office.documentserver.models.enums.DocumentType;
@@ -62,17 +62,17 @@ public class DefaultFileConfigurer implements FileConfigurer<DefaultFileWrapper>
 
     public void configure(FileModel fileModel, DefaultFileWrapper wrapper){  // define the file configurer
         if (fileModel != null){  // check if the file model is specified
-            WikiPage userFile = wrapper.getUserFile();  // get the fileName parameter from the file wrapper
+            WikiPageFile userFile = wrapper.getUserFile();  // get the fileName parameter from the file wrapper
             Action action = wrapper.getAction();  // get the action parameter from the file wrapper
 
-            DocumentType documentType = fileUtility.getDocumentType(userFile.getName() + "." + Extends.getExtends(userFile.getEditorType()));  // get the document type of the specified file
+            DocumentType documentType = fileUtility.getDocumentType(userFile.getFileName() + "." + FileUtil.extName(userFile.getFileUrl()));  // get the document type of the specified file
             fileModel.setDocumentType(documentType);  // set the document type to the file model
             fileModel.setType(wrapper.getType());  // set the platform type to the file model
 
 //            Permission userPermissions = mapper.toModel(wrapper.getUser().getPermissions());  // convert the permission entity to the model
             Permission userPermissions = new Permission(); // TODO
 
-            String fileExt = fileUtility.getFileExtension(userFile.getName() + "." + Extends.getExtends(userFile.getEditorType()));
+            String fileExt = fileUtility.getFileExtension(userFile.getFileName() + "." + FileUtil.extName(userFile.getFileUrl()));
             Boolean canEdit = fileUtility.getEditedExts().contains(fileExt);
             if ((!canEdit && action.equals(Action.edit) || action.equals(Action.fillForms)) && fileUtility.getFillExts().contains(fileExt)) {
                 canEdit = true;

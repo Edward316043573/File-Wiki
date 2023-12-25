@@ -6,7 +6,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import top.cxscoder.system.domain.DTO.RoleDTO;
 import top.cxscoder.system.domain.entity.Role;
@@ -63,7 +62,7 @@ public class RoleController {
      */
 //    @PreAuthorize("hasAnyAuthority('system:role:add')")
     @PostMapping
-    public boolean add(@Validated @RequestBody RoleDTO roleDto)
+    public boolean add(@RequestBody RoleDTO roleDto)
     {
         Role role = BeanUtil.copyProperties(roleDto, Role.class);
         return roleService.addRole(role);
@@ -92,7 +91,7 @@ public class RoleController {
      */
     @PreAuthorize("hasAnyAuthority('system:role:edit')")
     @PutMapping
-    public boolean edit(@Validated @RequestBody RoleDTO roleDto)
+    public boolean edit(@RequestBody RoleDTO roleDto)
     {
         Role role = BeanUtil.copyProperties(roleDto, Role.class);
         return roleService.updateWithMenu(role);

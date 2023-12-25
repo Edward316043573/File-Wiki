@@ -1,5 +1,7 @@
 package top.cxscoder.boot.controller.wiki;
 
+import cn.hutool.core.io.FileUtil;
+import cn.hutool.http.HttpUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +12,12 @@ import top.cxscoder.wiki.batch.BatchDocImportManager;
 import top.cxscoder.wiki.domain.entity.WikiPageFile;
 import top.cxscoder.wiki.enums.PageFileSource;
 import top.cxscoder.wiki.service.WikiPageFileServiceEx;
+import top.cxscoder.wiki.service.manage.WikiPageFileService;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +37,7 @@ public class WikiPageFileController {
 	
 	private final WikiPageFileServiceEx wikiPageFileServiceEx;
 	private final BatchDocImportManager batchDocImportManger;
-	
+	private final WikiPageFileService wikiPageFileService;
 	@PostMapping("/delete")
 	public void delete(@RequestBody WikiPageFile wikiPageFile) {
 		String info = wikiPageFileServiceEx.delete(wikiPageFile);
@@ -66,5 +73,27 @@ public class WikiPageFileController {
 		wikiPageFile.setFileSource(PageFileSource.UPLOAD_FILES.getSource());
 		return wikiPageFileServiceEx.basicUpload(wikiPageFile, file);
 	}
+
+	@GetMapping("/preview")
+	public void preview(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Long userFileId) throws IOException {
+		WikiPageFile userFile = wikiPageFileService.lambdaQuery().eq(WikiPageFile::getPageId, userFileId).one();
+		String extendName = FileUtil.extName(userFile.getFileUrl());
+		String fileName = userFile.getFileName() + "." + extendName;
+		try {
+			fileName = new String(fileName.getBytes("utf-8"), "ISO-8859-1");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+//		httpServletResponse.addHeader("Content-Disposition", "fileName=" + fileName);// 设置文件名
+		httpServletResponse.addHeader("Content-Disposition", "attachment;filename=" + fileName);// 设置文件名
+		String mimeType = HttpUtil.getMimeType(fileName);
+		httpServletResponse.setHeader("Content-Type", mimeType);
+		// TODO 媒体文件可以分块查看
+
+		// 调用文件下载方法
+		wikiPageFileService.previewFile(httpServletResponse,userFileId);
+	}
+
 }
 

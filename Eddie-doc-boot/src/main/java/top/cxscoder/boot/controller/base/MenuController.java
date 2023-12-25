@@ -70,7 +70,7 @@ public class MenuController {
      */
 //    @PreAuthorize("hasAnyAuthority('system:menu:add')")
     @PostMapping
-    public boolean add(@Validated @RequestBody Menu menu)
+    public boolean add(@RequestBody Menu menu)
     {
         if (!menuService.checkMenuNameUnique(menu))
         {
@@ -89,7 +89,7 @@ public class MenuController {
      */
     @PreAuthorize("hasAnyAuthority('system:menu:edit')")
     @PutMapping
-    public boolean edit(@Validated @RequestBody Menu menu)
+    public boolean edit(@RequestBody Menu menu)
     {
         if (!menuService.checkMenuNameUnique(menu))
         {

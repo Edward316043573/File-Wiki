@@ -22,7 +22,7 @@ package top.cxscoder.wiki.office.services.configurers.wrappers;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import top.cxscoder.wiki.domain.entity.WikiPage;
+import top.cxscoder.wiki.domain.entity.WikiPageFile;
 import top.cxscoder.wiki.office.documentserver.models.enums.Action;
 import top.cxscoder.wiki.office.documentserver.models.enums.Type;
 import top.cxscoder.wiki.office.entities.User;
@@ -31,7 +31,7 @@ import top.cxscoder.wiki.office.entities.User;
 @Builder
 @Setter
 public class DefaultFileWrapper {
-    private WikiPage userFile;
+    private WikiPageFile userFile;
     private Type type;
     private User user;
     private String lang;

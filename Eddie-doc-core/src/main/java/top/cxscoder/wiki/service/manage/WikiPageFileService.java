@@ -4,6 +4,9 @@ package top.cxscoder.wiki.service.manage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.cxscoder.wiki.domain.entity.WikiPageFile;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 /**
  * <p>
  *  服务类
@@ -13,5 +16,7 @@ import top.cxscoder.wiki.domain.entity.WikiPageFile;
  * @since 2019-03-06
  */
 public interface WikiPageFileService extends IService<WikiPageFile> {
+
+    void previewFile(HttpServletResponse httpServletResponse, Long userFileId) throws IOException;
 
 }

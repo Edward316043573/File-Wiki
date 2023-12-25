@@ -18,14 +18,14 @@
 
 package top.cxscoder.wiki.office.services.configurers.implementations;
 
+import cn.hutool.core.io.FileUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import top.cxscoder.wiki.domain.entity.WikiPage;
-import top.cxscoder.wiki.enums.Extends;
+import top.cxscoder.wiki.domain.entity.WikiPageFile;
 import top.cxscoder.wiki.office.documentserver.managers.document.DocumentManager;
 import top.cxscoder.wiki.office.documentserver.managers.template.TemplateManager;
 import top.cxscoder.wiki.office.documentserver.models.enums.Action;
@@ -73,9 +73,10 @@ public class DefaultEditorConfigConfigurer implements EditorConfigConfigurer<Def
 //            config.setActionLink(objectMapper.readValue(wrapper.getActionData(), (JavaType) new TypeToken<HashMap<String, Object>>() { }.getType()));  // set actionLink to the editorConfig
 //        }
 //        String fileName = wrapper.getFileName();  // set the fileName parameter from the editorConfig wrapper
-        WikiPage userFile = wrapper.getUserFile();
+        WikiPageFile userFile = wrapper.getUserFile();
 //        String fileExt = fileUtility.getFileExtension(fileName);
-        String fileName = userFile.getName() + "." + Extends.getExtends(userFile.getEditorType());
+
+        String fileName = userFile.getFileName() + "." + FileUtil.extName(userFile.getFileUrl());
         boolean userIsAnon = wrapper.getUser().getName().equals("Anonymous");  // check if the user from the editorConfig wrapper is anonymous or not
 
         config.setTemplates(userIsAnon ? null : templateManager.createTemplates(fileName));  // set a template to the editorConfig if the user is not anonymous

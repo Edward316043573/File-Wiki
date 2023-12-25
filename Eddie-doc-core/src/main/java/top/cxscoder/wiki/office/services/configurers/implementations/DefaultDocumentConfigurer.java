@@ -19,11 +19,11 @@
 package top.cxscoder.wiki.office.services.configurers.implementations;
 
 
+import cn.hutool.core.io.FileUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import top.cxscoder.wiki.domain.entity.WikiPage;
-import top.cxscoder.wiki.enums.Extends;
+import top.cxscoder.wiki.domain.entity.WikiPageFile;
 import top.cxscoder.wiki.office.documentserver.managers.document.DocumentManager;
 import top.cxscoder.wiki.office.documentserver.models.filemodel.Document;
 import top.cxscoder.wiki.office.documentserver.models.filemodel.Permission;
@@ -50,9 +50,9 @@ public class DefaultDocumentConfigurer implements DocumentConfigurer<DefaultDocu
     private ServiceConverter serviceConverter;
 
     public void configure(Document document, DefaultDocumentWrapper wrapper){  // define the document configurer
-        WikiPage userFile = wrapper.getUserFile();
+        WikiPageFile userFile = wrapper.getUserFile();
 
-        String fileName = userFile.getName() + "." + Extends.getExtends(userFile.getEditorType());  // get the fileName parameter from the document wrapper
+        String fileName = userFile.getFileName() + "." + FileUtil.extName(userFile.getFileUrl());  // get the fileName parameter from the document wrapper
         Permission permission = wrapper.getPermission();  // get the permission parameter from the document wrapper
 
         document.setTitle(fileName);  // set the title to the document config

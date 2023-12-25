@@ -60,7 +60,7 @@ public class PDFFileStrategy implements IFileStrategy {
         // 1. 找到文件路径 文件路径格式 上传路径/空间ID/页面层次结构
         WikiSpace wikiSpace = wikiSpaceService.getById(wikiPage.getSpaceId());
         StringBuffer filePathBuffer = new StringBuffer();
-        filePathBuffer.append(uploadPath).append(File.separator).append(wikiSpace.getName()).append(File.separator);
+        filePathBuffer.append(wikiSpace.getName()).append(File.separator);
         Long parentId = wikiPageFile.getPageId();
         Stack<String> s = new Stack<>();
         while(parentId != 0 ){
@@ -74,7 +74,8 @@ public class PDFFileStrategy implements IFileStrategy {
         }
         String filePath = filePathBuffer.append(file.getOriginalFilename()).toString();
         // 2.调用wikipageUploadService.update(wikiPage, context, context);
-        File dest = new File(filePath);
+
+        File dest = new File(uploadPath + File.separator +filePath);
         // 如果文件不存在则创建父目录
         if (!dest.exists()) {
             dest.getParentFile().mkdirs();

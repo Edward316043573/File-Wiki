@@ -8,7 +8,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.ObjectUtils;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.DTO.UserDTO;
@@ -92,7 +91,7 @@ public class UserController {
      */
     @PreAuthorize("hasAnyAuthority('system:user:add')")
     @PostMapping
-    public boolean add(@Validated @RequestBody UserDTO userDTO)
+    public boolean add(@RequestBody UserDTO userDTO)
     {
         User user = BeanUtil.copyProperties(userDTO,User.class);
         return userService.addUser(user);
@@ -103,7 +102,7 @@ public class UserController {
      */
     @PreAuthorize("hasAnyAuthority('system:user:edit')")
     @PutMapping
-    public boolean edit(@Validated @RequestBody UserDTO userDTO)
+    public boolean edit(@RequestBody UserDTO userDTO)
     {
         User user = BeanUtil.copyProperties(userDTO,User.class);
 

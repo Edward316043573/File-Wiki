@@ -11,13 +11,14 @@ import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.services.LoginService;
-import top.cxscoder.wiki.domain.entity.WikiPage;
+import top.cxscoder.wiki.domain.entity.WikiPageFile;
 import top.cxscoder.wiki.office.documentserver.models.enums.Action;
 import top.cxscoder.wiki.office.documentserver.models.enums.Type;
 import top.cxscoder.wiki.office.documentserver.models.filemodel.FileModel;
 import top.cxscoder.wiki.office.dto.PreviewOfficeFileDTO;
 import top.cxscoder.wiki.office.services.configurers.FileConfigurer;
 import top.cxscoder.wiki.office.services.configurers.wrappers.DefaultFileWrapper;
+import top.cxscoder.wiki.service.manage.WikiPageFileService;
 import top.cxscoder.wiki.service.manage.WikiPageService;
 
 import javax.annotation.Resource;
@@ -52,15 +53,21 @@ public class OfficeController {
     @Resource
     private WikiPageService wikiPageService;
 
+    @Resource
+    private WikiPageFileService wikiPageFileService;
+
     @PostMapping("/previewofficefile")
     public JSONObject previewOfficeFile(HttpServletRequest request, @RequestBody PreviewOfficeFileDTO previewOfficeFileDTO) {
         try {
             String previewUrl = request.getScheme() + "://" + deploymentHost + ":"
-                    + port + "/filetransfer/preview?"
+                    + port + "/wiki/page/file/preview?"
                     + "userFileId=" + previewOfficeFileDTO.getUserFileId()
                     + "&isMin=false&shareBatchNum=undefined&extractionCode=undefined";
+//            String previewUrl = request.getScheme() + "://" + deploymentHost + "/wiki/page/file/preview?"
+//                    + "userFileId=" + previewOfficeFileDTO.getUserFileId()
+//                    + "&isMin=false&shareBatchNum=undefined&extractionCode=undefined";
             User currentUser = loginService.getCurrentUser();
-            WikiPage userFile = wikiPageService.getById(previewOfficeFileDTO.getUserFileId());
+            WikiPageFile userFile = wikiPageFileService.lambdaQuery().eq(WikiPageFile::getPageId, previewOfficeFileDTO.getUserFileId()).one();
             Action action = Action.view;
             Type type = Type.desktop;
             Locale locale = new Locale("zh");
@@ -81,7 +88,7 @@ public class OfficeController {
             jsonObject.put("file",fileModel);
 //            jsonObject.put("fileHistory", historyManager.getHistory(fileModel.getDocument()));  // get file history and add it to the model
             jsonObject.put("docserviceApiUrl", docserviceSite + docserviceApiUrl);
-            jsonObject.put("reportName",userFile.getName());
+            jsonObject.put("reportName",userFile.getFileName());
             return jsonObject;
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());
