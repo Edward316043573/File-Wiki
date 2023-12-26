@@ -1,6 +1,7 @@
 package top.cxscoder.wiki.domain.vo;
 
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import top.cxscoder.wiki.domain.entity.WikiSpace;
 
@@ -54,6 +55,7 @@ public class WikiSpaceVo {
 	/**
 	 * 创建时间
 	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
 	private Date createTime;
 	/**
 	 * 创建时间

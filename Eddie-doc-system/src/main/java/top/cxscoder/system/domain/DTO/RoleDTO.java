@@ -1,11 +1,15 @@
 package top.cxscoder.system.domain.DTO;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import top.cxscoder.system.domain.VO.PageVo;
 
+import java.util.Date;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -17,6 +21,10 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RoleDTO extends PageVo {
+
+    private boolean admin;
+
+    private Long roleId;
 
     /** 角色名称 */
     private String roleName;
@@ -58,5 +66,25 @@ public class RoleDTO extends PageVo {
     /** 角色菜单权限 */
     private Set<String> permissions;
 
+    private String remark;
+    private String searchValue;
 
+    /** 创建者 */
+    private String createBy;
+
+    /** 创建时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createTime;
+
+    /** 更新者 */
+    private String updateBy;
+
+    /** 更新时间 */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date updateTime;
+
+    /** 请求参数 */
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
+    @TableField(exist = false)
+    private Map<String, Object> params;
 }

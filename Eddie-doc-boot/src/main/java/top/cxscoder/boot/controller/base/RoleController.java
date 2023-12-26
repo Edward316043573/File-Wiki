@@ -6,14 +6,20 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.ObjectUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import top.cxscoder.system.domain.DTO.RoleDTO;
 import top.cxscoder.system.domain.entity.Role;
+import top.cxscoder.system.domain.entity.RoleMenu;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.system.services.RoleService;
+import top.cxscoder.wiki.service.manage.RoleMenuService;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Edward
@@ -31,10 +37,12 @@ public class RoleController {
     @Resource
     LoginService loginService;
 
+    @Resource
+    RoleMenuService roleMenuService;
     /**
      * 获取角色列表
      */
-    @PreAuthorize("hasAnyAuthority('system:role:list')")
+//    @PreAuthorize("hasAnyAuthority('system:role:list')")
     @PostMapping("/list")
     public IPage<Role> list(@RequestBody RoleDTO roleDTO)
     {
@@ -42,8 +50,28 @@ public class RoleController {
         queryWrapper.like(!ObjectUtils.isEmpty(roleDTO.getRoleName()),Role::getRoleName,roleDTO.getRoleName());
         queryWrapper.like(!ObjectUtils.isEmpty(roleDTO.getRoleKey()),Role::getRoleKey,roleDTO.getRoleKey());
         queryWrapper.eq(!ObjectUtils.isEmpty(roleDTO.getStatus()),Role::getStatus,roleDTO.getStatus());
-        return roleService.page(new Page<>(roleDTO.getPage(), roleDTO.getPageSize()));
+        //需要将menuIds存入
+        Page<Role> rolePage = roleService.page(new Page<>(roleDTO.getPage(), roleDTO.getPageSize()),queryWrapper);
+        List<Role> updateRoles = rolePage.getRecords().stream().map(role -> {
+            Long roleId = role.getRoleId();
+//            QueryWrapper<RoleMenu> wrapper = new QueryWrapper<>();
+//            wrapper.eq("roleid", roleId);
+            LambdaQueryWrapper<RoleMenu> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(RoleMenu::getRoleId,roleId);
+            List<RoleMenu> roleMenus = roleMenuService.list(wrapper);
+            List<Long> menuIds = new ArrayList<>();
+            for (RoleMenu roleMenu : roleMenus) {
+                menuIds.add(roleMenu.getMenuId());
+            }
+            Long[] ids = menuIds.toArray(new Long[0]);
+            role.setMenuIds(ids);
+            return role;
+        }).collect(Collectors.toList());
+        rolePage.setRecords(updateRoles);
+        return rolePage;
     }
+
+
 
     /**
      * 根据角色编号获取详细信息
@@ -62,7 +90,7 @@ public class RoleController {
      */
 //    @PreAuthorize("hasAnyAuthority('system:role:add')")
     @PostMapping
-    public boolean add(@RequestBody RoleDTO roleDto)
+    public boolean add(@Validated @RequestBody RoleDTO roleDto)
     {
         Role role = BeanUtil.copyProperties(roleDto, Role.class);
         return roleService.addRole(role);
@@ -89,9 +117,9 @@ public class RoleController {
     /**
      * 修改保存角色
      */
-    @PreAuthorize("hasAnyAuthority('system:role:edit')")
+//    @PreAuthorize("hasAnyAuthority('system:role:edit')")
     @PutMapping
-    public boolean edit(@RequestBody RoleDTO roleDto)
+    public boolean edit( @RequestBody RoleDTO roleDto)
     {
         Role role = BeanUtil.copyProperties(roleDto, Role.class);
         return roleService.updateWithMenu(role);

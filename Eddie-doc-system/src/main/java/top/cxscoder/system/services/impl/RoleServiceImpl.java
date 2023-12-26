@@ -80,7 +80,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
      */
     @Override
     public void checkRoleAllowed(Role role) {
-        if (!ObjectUtils.isEmpty(role.getRoleId()) && role.isAdmin())
+        if (!ObjectUtils.isEmpty(role.getRoleId()) && !role.isAdmin())
         {
             throw new ServiceException("不允许操作超级管理员角色");
         }
