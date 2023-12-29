@@ -17,8 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
+import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.common.constant.DocSysType;
-import top.cxscoder.wiki.common.constant.UserSettingConst;import top.cxscoder.wiki.domain.DTO.WikiSpaceDTO;
+import top.cxscoder.wiki.common.constant.UserSettingConst;
+import top.cxscoder.wiki.domain.dto.SpaceFavoruiteDTO;
+import top.cxscoder.wiki.domain.dto.UserSettingDTO;
+import top.cxscoder.wiki.domain.dto.WikiSpaceDTO;
 import top.cxscoder.wiki.domain.entity.UserGroupAuth;
 import top.cxscoder.wiki.domain.entity.UserSetting;
 import top.cxscoder.wiki.domain.entity.WikiSpace;
@@ -52,13 +56,12 @@ public class WikiSpaceController {
 	private final UserGroupAuthService userGroupAuthService;
 	private final WikiSpaceFavoriteService wikiSpaceFavoriteService;
 	private final UserSettingService userSettingService;
+	private final LoginService loginService;
 
 //	@PreAuthorize("hasAnyAuthority('wiki:space:list')")
 	@PostMapping("/list")
 	public List<WikiSpaceVo> list(@RequestBody WikiSpaceDTO wikiSpaceDTO) {
-		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		User currentUser = loginUser.getUser();
-		//		DocUserDetails currentUser = DocUserUtil.getCurrentUser();
+		User currentUser = loginService.getCurrentUser();
 		LambdaQueryWrapper<WikiSpace> wrapper = new LambdaQueryWrapper<>();
 		wrapper.eq(WikiSpace::getDelFlag, 0);
 		wrapper.eq(wikiSpaceDTO.getId() != null, WikiSpace::getId, wikiSpaceDTO.getId());
@@ -116,12 +119,11 @@ public class WikiSpaceController {
 	}
 	
 	@PostMapping("/setting/update")
-	public void settingUpdate(String name, String value) {
-		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		User currentUser = loginUser.getUser();
+	public void settingUpdate(@RequestBody UserSettingDTO userSettingDTO) {
+		User currentUser = loginService.getCurrentUser();
 		QueryWrapper<UserSetting> wrapper = new QueryWrapper<>();
 		wrapper.eq("user_id", currentUser.getUserId());
-		wrapper.eq("name", name);
+		wrapper.eq("name", userSettingDTO.getName());
 		UserSetting userSettingSel = userSettingService.getOne(wrapper);
 		UserSetting userSettingUp = new UserSetting();
 		if (userSettingSel != null) {
@@ -129,8 +131,8 @@ public class WikiSpaceController {
 		} else {
 			userSettingUp.setCreateTime(new Date());
 		}
-		userSettingUp.setName(name);
-		userSettingUp.setValue(value);
+		userSettingUp.setName(userSettingDTO.getName());
+		userSettingUp.setValue(userSettingDTO.getValue());
 		userSettingUp.setDelFlag(0);
 		userSettingUp.setUserId(currentUser.getUserId());
 		userSettingService.saveOrUpdate(userSettingUp);
@@ -153,11 +155,10 @@ public class WikiSpaceController {
 	}
 	
 	@PostMapping("/favorite/update")
-	public void groupAuth(Long spaceId, Integer delFlag) {
-		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		User currentUser = loginUser.getUser();
+	public void groupAuth(@RequestBody SpaceFavoruiteDTO spaceFavoruiteDTO) {
+		User currentUser = loginService.getCurrentUser();
 		QueryWrapper<WikiSpaceFavorite> wrapper = new QueryWrapper<>();
-		wrapper.eq("space_id", spaceId);
+		wrapper.eq("space_id", spaceFavoruiteDTO.getSpaceId());
 		wrapper.eq("user_id", currentUser.getUserId());
 		WikiSpaceFavorite favoriteSel = wikiSpaceFavoriteService.getOne(wrapper);
 		WikiSpaceFavorite favoriteUp = new WikiSpaceFavorite();
@@ -166,9 +167,9 @@ public class WikiSpaceController {
 		} else {
 			favoriteUp.setCreateTime(new Date());
 		}
-		favoriteUp.setDelFlag(delFlag);
+		favoriteUp.setDelFlag(spaceFavoruiteDTO.getDelFlag());
 		favoriteUp.setUserId(currentUser.getUserId());
-		favoriteUp.setSpaceId(spaceId);
+		favoriteUp.setSpaceId(spaceFavoruiteDTO.getSpaceId());
 		wikiSpaceFavoriteService.saveOrUpdate(favoriteUp);
 	}
 
