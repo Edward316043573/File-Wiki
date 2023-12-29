@@ -1,24 +1,34 @@
 package top.cxscoder.wiki.service.manage.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.security.LoginUser;
 import top.cxscoder.wiki.domain.entity.UserMessage;
 import top.cxscoder.wiki.domain.entity.WikiPage;
+import top.cxscoder.wiki.domain.entity.WikiPageFile;
+import top.cxscoder.wiki.domain.entity.WikiSpace;
 import top.cxscoder.wiki.repository.mapper.WikiPageMapper;
 import top.cxscoder.wiki.domain.vo.WikiPageTemplateInfoVo;
 import top.cxscoder.wiki.common.constant.DocSysType;
 import top.cxscoder.wiki.common.constant.UserMsgType;
 import top.cxscoder.wiki.service.manage.UserMessageService;
+import top.cxscoder.wiki.service.manage.WikiPageFileService;
 import top.cxscoder.wiki.service.manage.WikiPageService;
+import top.cxscoder.wiki.service.manage.WikiSpaceService;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
+import java.util.Stack;
 
 /**
  * <p>
@@ -35,6 +45,15 @@ public class WikiPageServiceImpl extends ServiceImpl<WikiPageMapper, WikiPage> i
 	WikiPageMapper wikiPageMapper;
 	@Resource
 	UserMessageService userMessageService;
+
+	@Value("${wiki.upload-path:}")
+	String filePath;
+
+	@Resource
+	WikiSpaceService wikiSpaceService;
+
+	@Resource
+	WikiPageFileService wikiPageFileService;
 	
 	@Override
 	public void changeParent(WikiPage wikiPage, Integer beforeSeq, Integer afterSeq) {
@@ -77,11 +96,51 @@ public class WikiPageServiceImpl extends ServiceImpl<WikiPageMapper, WikiPage> i
 		// 递归删除
 		this.deletePageAndSon(wikiPage);
 	}
-	
-	private void deletePageAndSon(WikiPage wikiPage) {
-		wikiPage.setDelFlag(1);
-		this.updateById(wikiPage);
-		
+
+	@Transactional
+	public void deletePageAndSon(WikiPage wikiPage) {
+		//获取删除文件的路径，判断删除的是文件还是文件夹
+		Long pageId = wikiPage.getId();
+		LambdaQueryWrapper<WikiPageFile> queryWrapper= new LambdaQueryWrapper<>();
+		queryWrapper.eq(WikiPageFile::getPageId,pageId);
+		wikiPage = getById(wikiPage);
+		WikiPageFile file= wikiPageFileService.getOne(queryWrapper);
+		String fileName = wikiPage.getName();
+		String path;
+		//删除文件
+		if (file != null){
+			String fileUrl = file.getFileUrl();
+			path = filePath + File.separator + fileUrl;
+		}
+		//删除文件夹
+		else {
+			WikiSpace wikiSpace = wikiSpaceService.getById(wikiPage.getSpaceId());
+			StringBuffer filePathBuffer = new StringBuffer();
+			filePathBuffer.append(wikiSpace.getName()).append(File.separator);
+			Long parentId = wikiPage.getParentId();
+			Stack<String> s = new Stack<>();
+			while(parentId != 0 ){
+				WikiPage parentPage = getById(parentId);
+				String parentName = parentPage.getName();
+				s.push(parentName);
+				parentId = parentPage.getParentId();
+			}
+			while(!s.isEmpty()) {
+				filePathBuffer.append(s.pop()).append(File.separator);
+			}
+			path = filePath + File.separator + fileName;
+		}
+		File deleteFile = new File(path);
+		try {
+			deleteFile.delete();
+		} catch (Exception e) {
+			throw new ServiceException("删除文件失败");
+		}
+
+		this.removeById(wikiPage);
+		if (file!=null){
+			wikiPageFileService.removeById(file);
+		}
 		QueryWrapper<WikiPage> wrapper = new QueryWrapper<>();
 		wrapper.eq("del_flag", 0);
 		wrapper.eq("parent_id", wikiPage.getId());
