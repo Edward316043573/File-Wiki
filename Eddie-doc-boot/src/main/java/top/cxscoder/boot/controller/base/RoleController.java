@@ -97,23 +97,6 @@ public class RoleController {
 
     }
 
-//    @PreAuthorize("hasAnyAuthority('system:role:add')")
-//    @PostMapping
-//    public boolean add(@Validated @RequestBody Role role)
-//    {
-//        if (!roleService.checkRoleNameUnique(role))
-//        {
-//            throw new ServiceException("新增角色'" + role.getRoleName() + "'失败，角色名称已存在");
-//        }
-//        else if (!roleService.checkRoleKeyUnique(role))
-//        {
-//            throw new ServiceException("新增角色'" + role.getRoleName() + "'失败，角色权限已存在");
-//        }
-//        role.setCreateBy(loginService.getUsername());
-//        return roleService.save(role);
-//
-//    }
-
     /**
      * 修改保存角色
      */

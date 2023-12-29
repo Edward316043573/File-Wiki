@@ -17,12 +17,9 @@ public interface RoleService extends IService<Role> {
 
     boolean checkRoleKeyUnique(Role role);
 
-    void checkRoleAllowed(Role role);
-
     boolean addRole(Role role);
 
     boolean removeRoleWithMenu(List<Long> asList);
 
-    boolean updateWithMenu(Role role
-    );
+    boolean updateWithMenu(Role role);
 }

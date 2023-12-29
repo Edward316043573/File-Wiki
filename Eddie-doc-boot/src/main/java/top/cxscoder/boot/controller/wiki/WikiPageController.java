@@ -139,7 +139,6 @@ public class WikiPageController {
         wrapperZan.eq(WikiPageZan::getYn, 1);
         WikiPageZan pageZan = wikiPageZanService.getOne(wrapperZan);
         WikiPageContentVo vo = new WikiPageContentVo();
-        vo.setWikiPage(wikiPageSel);
         vo.setPageContent(pageContent);
         vo.setFileList(pageFiles);
         vo.setSelfZan((pageZan != null) ? 1 : 0);
@@ -150,6 +149,7 @@ public class WikiPageController {
         String canUploadFile = wikiPageAuthService.canUploadFile(wikiSpaceSel, wikiPageSel.getId(), currentUser.getUserId());
         String canDeleteFile = wikiPageAuthService.canDeleteFile(wikiSpaceSel, wikiPageSel.getId(), currentUser.getUserId());
         String canConfigAuth = wikiPageAuthService.canConfigAuth(wikiSpaceSel, wikiPageSel.getId(), currentUser.getUserId());
+        // 如果为空代表有权限，否则表示没权限
         vo.setCanEdit((canEdit == null) ? 1 : 0);
         vo.setCanDelete((canDelete == null) ? 1 : 0);
         vo.setCanDeleteFile((canDeleteFile == null) ? 1 : 0);
@@ -168,8 +168,7 @@ public class WikiPageController {
 
     @PostMapping("/changeParent")
     public void changeParent(@RequestBody WikiPage wikiPage, Integer beforeSeq, Integer afterSeq) {
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = loginUser.getUser();
+        User currentUser = loginService.getCurrentUser();
         WikiPage wikiPageSel = wikiPageService.getById(wikiPage.getId());
         // 编辑权限判断
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
