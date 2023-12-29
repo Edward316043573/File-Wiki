@@ -116,7 +116,6 @@ public class WikiPageFileServiceImpl extends ServiceImpl<WikiPageFileMapper, Wik
                     PDOutlineItem chapterItem = new PDOutlineItem();
                     chapterItem.setDestination(dest);
                     chapterItem.setTitle(file.getName());
-
                     // 将目录项添加到父级目录项中
                     parentOutlineItem.addLast(chapterItem);
                 } else if (file.isDirectory()) {
