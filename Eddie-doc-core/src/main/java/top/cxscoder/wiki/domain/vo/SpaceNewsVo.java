@@ -1,5 +1,6 @@
 package top.cxscoder.wiki.domain.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -12,6 +13,7 @@ import java.util.Date;
  */
 @Data
 public class SpaceNewsVo {
+
 	private String space;
 	private Long spaceId;
 	private Long pageId;
@@ -19,7 +21,11 @@ public class SpaceNewsVo {
 	private Integer viewNum;
 	private String createUserName;
 	private String updateUserName;
+
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
 	private Date createTime;
+
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
 	private Date updateTime;
 
 	private String spaceName;

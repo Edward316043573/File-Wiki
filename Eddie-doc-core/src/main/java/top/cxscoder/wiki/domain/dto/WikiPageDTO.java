@@ -1,7 +1,8 @@
-package top.cxscoder.wiki.domain.dto;
+package top.cxscoder.wiki.domain.DTO;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import top.cxscoder.system.domain.VO.PageVo;
 
@@ -78,6 +79,9 @@ public class WikiPageDTO extends PageVo {
     /**
      * 修改时间
      */
+
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", locale = "zh", timezone = "GMT+8")
     private Date updateTime;
 
     /**
