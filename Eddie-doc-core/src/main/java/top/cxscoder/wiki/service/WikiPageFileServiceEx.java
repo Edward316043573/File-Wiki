@@ -91,7 +91,6 @@ public class WikiPageFileServiceEx {
         User currentUser = loginUser.getUser();
         Long pageId = wikiPageFile.getPageId();
         if (pageId == null || pageId <= 0) {
-//            return DocResponseJson.warn("未指定附件关联的文档");
             throw new ServiceException("未指定附件关联的文档");
         }
         WikiPage wikiPageSel = wikiPageService.getById(pageId);
@@ -99,12 +98,10 @@ public class WikiPageFileServiceEx {
         // 权限判断
         String canUploadFile = wikiPageAuthService.canUploadFile(wikiSpaceSel, wikiPageSel.getId(), currentUser.getUserId());
         if (canUploadFile != null) {
-//            return DocResponseJson.warn(canUploadFile);
             throw new ServiceException(canUploadFile);
         }
         String info = this.uploadFile(wikiPageFile, file, 0);
         if (null != info) {
-//            return DocResponseJson.warn(info);
             throw new ServiceException(info);
         }
         // 给相关人发送消息
@@ -112,7 +109,6 @@ public class WikiPageFileServiceEx {
         userMessage.setAffectUserId(wikiPageSel.getCreateUserId());
         userMessage.setAffectUserName(wikiPageSel.getCreateUserName());
         userMessageService.addWikiMessage(userMessage);
-//        return DocResponseJson.ok(wikiPageFile);
         return wikiPageFile;
     }
 

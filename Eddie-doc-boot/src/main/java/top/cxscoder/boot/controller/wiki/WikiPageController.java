@@ -13,6 +13,7 @@ import org.docx4j.XmlUtils;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.AltChunkType;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +23,8 @@ import top.cxscoder.system.security.LoginUser;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.common.constant.DocSysType;
 import top.cxscoder.wiki.common.constant.UserMsgType;
+import top.cxscoder.wiki.domain.DTO.WikiPageDTO;
 import top.cxscoder.wiki.domain.SearchByEsParam;
-import top.cxscoder.wiki.domain.dto.WikiPageDTO;
 import top.cxscoder.wiki.domain.entity.*;
 import top.cxscoder.wiki.domain.vo.SpaceNewsVo;
 import top.cxscoder.wiki.domain.vo.WikiPageContentVo;
@@ -42,6 +43,7 @@ import top.cxscoder.wiki.uitls.CacheUtil;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -75,6 +77,9 @@ public class WikiPageController {
     private final WikiPageCommentService wikiPageCommentService;
     private final WikiPageTemplateService wikiPageTemplateService;
     private final LoginService loginService;
+
+    @Value("${wiki.upload-path:}")
+    private String uploadPath;
 
 //    @PreAuthorize("hasAnyAuthority('wiki:page:list')")
     @PostMapping("/list")
@@ -356,8 +361,7 @@ public class WikiPageController {
 
     @PostMapping("/rename")
     public WikiPage rename(@RequestBody WikiPage wikiPage) {
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = loginUser.getUser();
+        User currentUser = loginService.getCurrentUser();
         if (StringUtils.isBlank(wikiPage.getName())) {
 //            return DocResponseJson.warn("标题不能为空！");
             throw new ServiceException("标题不能为空！");
@@ -366,14 +370,56 @@ public class WikiPageController {
 //            return DocResponseJson.warn("不能为新建的文档改名！");
             throw new ServiceException("不能为新建的文档改名！");
         }
+        //查询原文件夹的名字
         Long pageId = wikiPage.getId();
-        Long spaceId = wikiPage.getSpaceId();
+
+        WikiPage page = wikiPageService.getById(wikiPage.getId());
+        Long spaceId = page.getSpaceId();
+        String originFileName = page.getName();
+        String newFileName = wikiPage.getName();
+
+        // 1. 找到文件路径 文件路径格式 上传路径/空间ID/页面层次结构
+        WikiSpace wikiSpace = wikiSpaceService.getById(spaceId);
+        StringBuffer filePathBuffer = new StringBuffer();
+        filePathBuffer.append(wikiSpace.getName()).append(File.separator);
+        Long parentId = page.getParentId();
+        Stack<String> s = new Stack<>();
+        while(parentId != 0 ){
+            WikiPage parentPage = wikiPageService.getById(parentId);
+            String parentName = parentPage.getName();
+            s.push(parentName);
+            parentId = parentPage.getParentId();
+        }
+        while(!s.isEmpty()) {
+            filePathBuffer.append(s.pop()).append(File.separator);
+        }
+        String originFilePath = filePathBuffer + originFileName;
+        String newFilePath = filePathBuffer + newFileName;
+        File originFile = new File(uploadPath+File.separator+originFilePath);
+        File newFile = new File(uploadPath+File.separator+newFilePath);
+        originFile.renameTo(newFile);
+
+        //修改数据库中的文件夹名字
+        page.setName(newFileName);
+        wikiPageService.updateById(page);
+        //查询该文件夹下的所有文件
+        LambdaQueryWrapper<WikiPageFile> wrapper = new LambdaQueryWrapper<>();
+        String tempPath = originFilePath.replace(File.separator,File.separator+File.separator);
+        wrapper.likeRight(WikiPageFile::getFileUrl,tempPath);
+        List<WikiPageFile> wikiPageFiles = wikiPageFileService.list(wrapper);
+        wikiPageFiles= wikiPageFiles.stream().map(wikiPageFile -> {
+
+            wikiPageFile.setFileUrl(wikiPageFile.getFileUrl().replace(originFilePath,newFilePath));
+            return wikiPageFile;
+        }).collect(Collectors.toList());
+        for (WikiPageFile wikiPageFile : wikiPageFiles) {
+            wikiPageFileService.updateById(wikiPageFile);
+        }
         WikiPage wikiPageSel = wikiPageService.getById(pageId);
         // 编辑权限判断
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
         String canEdit = wikiPageAuthService.canEdit(wikiSpaceSel, wikiPageSel.getEditType(), wikiPageSel.getId(), currentUser.getUserId());
         if (canEdit != null) {
-//            return DocResponseJson.warn(canEdit);
             throw new ServiceException(canEdit);
         }
         spaceId = wikiPageSel.getSpaceId();
@@ -383,9 +429,9 @@ public class WikiPageController {
         wikiPage.setUpdateUserId(currentUser.getUserId());
         wikiPage.setUpdateUserName(currentUser.getUserName());
         wikiPageService.updateById(oldWikiPage);
-        UpdateWrapper<WikiPageContent> wrapper = new UpdateWrapper<>();
-        wrapper.eq("page_id", wikiPage.getId());
-        WikiPageContent pageContent = wikiPageContentService.getOne(wrapper);
+        UpdateWrapper<WikiPageContent> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("page_id", wikiPage.getId());
+        WikiPageContent pageContent = wikiPageContentService.getOne(updateWrapper);
         // 给相关人发送消息
         UserMessage userMessage = userMessageService.createUserMessage(currentUser, wikiPageSel.getId(), wikiPageSel.getName(), DocSysType.WIKI, UserMsgType.WIKI_PAGE_UPDATE);
         userMessageService.addWikiMessage(userMessage);
@@ -393,7 +439,6 @@ public class WikiPageController {
             // 创建历史记录
             wikiPageHistoryService.saveRecord(spaceId, wikiPage.getId(), pageContent.getContent());
         } catch (ServiceException e) {
-//            return DocResponseJson.warn(e.getMessage());
             throw new ServiceException(e.getMessage());
         }
         return wikiPage;
