@@ -139,6 +139,7 @@ public class WikiPageController {
         wrapperZan.eq(WikiPageZan::getYn, 1);
         WikiPageZan pageZan = wikiPageZanService.getOne(wrapperZan);
         WikiPageContentVo vo = new WikiPageContentVo();
+        vo.setWikiPage(wikiPageSel);
         vo.setPageContent(pageContent);
         vo.setFileList(pageFiles);
         vo.setSelfZan((pageZan != null) ? 1 : 0);
