@@ -56,7 +56,7 @@ public class BatchDocImportManager {
         } catch (Exception e) {
             log.warn("导入文件发生错误：{}", e.getMessage());
 //            return DocResponseJson.warn("导入文件发生错误！");
-            throw new ServiceException("导入文件发生错误！");
+            throw new ServiceException("导入文件发生错误！" + e.getMessage());
         }
     }
 
