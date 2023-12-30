@@ -73,18 +73,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         return roles.size() <= 0;
     }
 
-    /**
-     * 校验角色是否允许操作
-     *
-     * @param role 角色信息
-     */
-    @Override
-    public void checkRoleAllowed(Role role) {
-        if (!ObjectUtils.isEmpty(role.getRoleId()) && !role.isAdmin())
-        {
-            throw new ServiceException("不允许操作超级管理员角色");
-        }
-    }
 
     @Override
     @Transactional
@@ -151,7 +139,6 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     @Transactional
     public boolean updateWithMenu(Role role) {
-       checkRoleAllowed(role);
        checkRoleDataScope(role.getRoleId());
        // TODO 一样 需要校验
 //        if (!checkRoleNameUnique(role))
