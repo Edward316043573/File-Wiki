@@ -5,14 +5,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.system.domain.entity.User;
-import top.cxscoder.system.security.LoginUser;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.common.constant.DocSysModuleType;
 import top.cxscoder.wiki.common.constant.DocSysType;
@@ -121,8 +119,7 @@ public class WikiPageAuthController {
 
     @PostMapping("/list")
     public List<UserPageAuthVo> list(Long pageId) {
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = loginUser.getUser();
+        User currentUser = loginService.getCurrentUser();
         WikiPage wikiPageSel = wikiPageService.getById(pageId);
         WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
         String canConfigAuth = wikiPageAuthService.canConfigAuth(wikiSpaceSel, pageId, currentUser.getUserId());

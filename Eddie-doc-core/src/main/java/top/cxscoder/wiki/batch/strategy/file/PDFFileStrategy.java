@@ -16,7 +16,6 @@ import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.domain.entity.WikiPage;
 import top.cxscoder.wiki.domain.entity.WikiPageFile;
-import top.cxscoder.wiki.domain.entity.WikiPageHistory;
 import top.cxscoder.wiki.domain.entity.WikiSpace;
 import top.cxscoder.wiki.service.WikiPageUploadService;
 import top.cxscoder.wiki.service.manage.WikiPageFileService;
@@ -112,13 +111,7 @@ public class PDFFileStrategy implements IFileStrategy {
             pageFile.setUuid(simpleUUID);
             wikiPageFileService.updateById(pageFile);
             //3.更新history表
-            WikiPageHistory wikiPageHistory = new WikiPageHistory();
-            wikiPageHistory.setPageId(pageFile.getPageId());
-            wikiPageHistory.setCreateTime(new Date());
-            wikiPageHistory.setCreateUserId(currentUser.getUserId());
-            wikiPageHistory.setCreateUserName(currentUser.getUserName());
-            wikiPageHistory.setContent(historyFilePath.getBytes());
-            wikiPageHistoryService.save(wikiPageHistory);
+            wikiPageHistoryService.saveRecord(wikiSpace.getId(),pageFile.getPageId(),historyFilePath);
         }
         else {
             //正常上传文件

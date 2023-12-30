@@ -19,5 +19,6 @@ public interface WikiPageFileService extends IService<WikiPageFile> {
 
     void previewFile(HttpServletResponse httpServletResponse, Long userFileId) throws IOException;
 
+    void previewHistoryFile(HttpServletResponse httpServletResponse, String url) throws IOException;
     String export(Long spaceId);
 }

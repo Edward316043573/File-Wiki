@@ -53,6 +53,11 @@ public class WikiPageFileServiceImpl extends ServiceImpl<WikiPageFileMapper, Wik
     }
 
     @Override
+    public void previewHistoryFile(HttpServletResponse httpServletResponse, String url) throws IOException {
+        IOUtils.copy(new FileInputStream(url), httpServletResponse.getOutputStream());
+    }
+
+    @Override
     public String export(Long spaceId) {
         LambdaQueryWrapper<WikiSpace> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(WikiSpace::getId,spaceId);

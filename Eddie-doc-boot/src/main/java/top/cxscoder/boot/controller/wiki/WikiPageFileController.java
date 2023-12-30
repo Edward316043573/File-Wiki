@@ -21,6 +21,7 @@ import top.cxscoder.wiki.service.manage.WikiSpaceService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -47,6 +48,9 @@ public class WikiPageFileController {
 
 	@Value("${wiki.upload-path:}")
 	private String uploadPath;
+
+	@Value("${wiki.history-path:}")
+	private String historyPath;
 
 
 
@@ -107,6 +111,25 @@ public class WikiPageFileController {
 
 		// 调用文件下载方法
 		wikiPageFileService.previewFile(httpServletResponse,userFileId);
+	}
+
+	@GetMapping("/preview/history")
+	public void previewHistory(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String url) throws IOException {
+		int lastIndex = url.lastIndexOf("\\");
+		String fileName = url.substring(lastIndex + 1);
+		try {
+			fileName = new String(fileName.getBytes("utf-8"), "ISO-8859-1");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+//		httpServletResponse.addHeader("Content-Disposition", "fileName=" + fileName);// 设置文件名
+		httpServletResponse.addHeader("Content-Disposition", "attachment;filename=" + fileName);// 设置文件名
+		String mimeType = HttpUtil.getMimeType(fileName);
+		httpServletResponse.setHeader("Content-Type", mimeType);
+		// TODO 媒体文件可以分块查看
+        String fileUrl = historyPath + File.separator + url;
+		// 调用文件下载方法
+		wikiPageFileService.previewHistoryFile(httpServletResponse,fileUrl);
 	}
 
 	@GetMapping("/PDFStorePath")

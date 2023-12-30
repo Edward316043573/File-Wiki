@@ -55,20 +55,28 @@ public class OfficeController {
 
     @Resource
     private WikiPageFileService wikiPageFileService;
-
     @PostMapping("/previewofficefile")
     public JSONObject previewOfficeFile(HttpServletRequest request, @RequestBody PreviewOfficeFileDTO previewOfficeFileDTO) {
-        try {
-            String previewUrl = request.getScheme() + "://" + deploymentHost + ":"
+        String previewUrl = null;
+
+        if (previewOfficeFileDTO.getPreviewUrl() !=null){
+          previewUrl = request.getScheme() + "://" + deploymentHost + ":"
+                    + port + "/wiki/page/file/preview/history?"
+                    + "url=" + previewOfficeFileDTO.getPreviewUrl()
+                    + "&isMin=false&shareBatchNum=undefined&extractionCode=undefined";
+        }else {
+            previewUrl = request.getScheme() + "://" + deploymentHost + ":"
                     + port + "/wiki/page/file/preview?"
                     + "userFileId=" + previewOfficeFileDTO.getUserFileId()
                     + "&isMin=false&shareBatchNum=undefined&extractionCode=undefined";
+        }
+        try {
             User currentUser = loginService.getCurrentUser();
             WikiPageFile userFile = wikiPageFileService.lambdaQuery().eq(WikiPageFile::getPageId, previewOfficeFileDTO.getUserFileId()).one();
             Action action = Action.view;
             Type type = Type.desktop;
             Locale locale = new Locale("zh");
-            top.cxscoder.wiki.office.entities.User user = new top.cxscoder.wiki.office.entities.User (currentUser);
+            top.cxscoder.wiki.office.entities.User user = new top.cxscoder.wiki.office.entities.User(currentUser);
             FileModel fileModel = fileConfigurer.getFileModel(
                     DefaultFileWrapper
                             .builder()
@@ -82,15 +90,49 @@ public class OfficeController {
             );
 
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("file",fileModel);
-//            jsonObject.put("fileHistory", historyManager.getHistory(fileModel.getDocument()));  // get file history and add it to the model
+            jsonObject.put("file", fileModel);
             jsonObject.put("docserviceApiUrl", docserviceSite + docserviceApiUrl);
-            jsonObject.put("reportName",userFile.getFileName());
+            jsonObject.put("reportName", userFile.getFileName());
             return jsonObject;
         } catch (Exception e) {
             throw new ServiceException(e.getMessage());
         }
     }
+//    @PostMapping("/previewofficefile")
+//    public JSONObject previewOfficeFile(HttpServletRequest request, @RequestBody PreviewOfficeFileDTO previewOfficeFileDTO) {
+//        try {
+//            String previewUrl = request.getScheme() + "://" + deploymentHost + ":"
+//                    + port + "/wiki/page/file/preview?"
+//                    + "userFileId=" + previewOfficeFileDTO.getUserFileId()
+//                    + "&isMin=false&shareBatchNum=undefined&extractionCode=undefined";
+//            User currentUser = loginService.getCurrentUser();
+//            WikiPageFile userFile = wikiPageFileService.lambdaQuery().eq(WikiPageFile::getPageId, previewOfficeFileDTO.getUserFileId()).one();
+//            Action action = Action.view;
+//            Type type = Type.desktop;
+//            Locale locale = new Locale("zh");
+//            top.cxscoder.wiki.office.entities.User user = new top.cxscoder.wiki.office.entities.User (currentUser);
+//            FileModel fileModel = fileConfigurer.getFileModel(
+//                    DefaultFileWrapper
+//                            .builder()
+//                            .userFile(userFile)
+//                            .type(type)
+//                            .lang(locale.toLanguageTag())
+//                            .action(action)
+//                            .user(user)
+//                            .actionData(previewUrl)
+//                            .build()
+//            );
+//
+//            JSONObject jsonObject = new JSONObject();
+//            jsonObject.put("file",fileModel);
+////            jsonObject.put("fileHistory", historyManager.getHistory(fileModel.getDocument()));  // get file history and add it to the model
+//            jsonObject.put("docserviceApiUrl", docserviceSite + docserviceApiUrl);
+//            jsonObject.put("reportName",userFile.getFileName());
+//            return jsonObject;
+//        } catch (Exception e) {
+//            throw new ServiceException(e.getMessage());
+//        }
+//    }
 
 
 
