@@ -26,6 +26,7 @@ import top.cxscoder.wiki.service.manage.WikiSpaceService;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Stack;
@@ -67,7 +68,7 @@ public class PDFFileStrategy implements IFileStrategy {
         wrapper.eq(WikiPage::getParentId,pageId);
         List<WikiPage> wikiPages = wikiPageService.list(wrapper);
         List<WikiPage> wikiPageList = wikiPages.stream().filter(w -> w.getName().equals(fileName)).collect(Collectors.toList());
-        if (wikiPageList.size()>0){
+        if (wikiPageList.size() > 0){
             WikiPage wikiPage = wikiPageList.get(0);
             LambdaQueryWrapper<WikiPageFile> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(WikiPageFile::getPageId,wikiPage.getId());
@@ -92,8 +93,9 @@ public class PDFFileStrategy implements IFileStrategy {
             while(!s.isEmpty()) {
                 filePathBuffer.append(s.pop()).append(File.separator);
             }
-            String filePath = filePathBuffer.append(file.getOriginalFilename()).toString();
-            String historyFilePath = filePathBuffer.append(pageFile.getUuid()+".pdf").toString();
+            String filePath = filePathBuffer+file.getOriginalFilename();
+            String historyFilePath = filePathBuffer+pageFile.getUuid()+".pdf";
+
             File originFile = new File(uploadPath + File.separator +filePath);
             File historyFile = new File(historyPath + File.separator +historyFilePath);
             // 如果文件不存在则创建父目录
@@ -111,7 +113,8 @@ public class PDFFileStrategy implements IFileStrategy {
             pageFile.setUuid(simpleUUID);
             wikiPageFileService.updateById(pageFile);
             //3.更新history表
-            wikiPageHistoryService.saveRecord(wikiSpace.getId(),pageFile.getPageId(),historyFilePath);
+            String encodedPath = Base64.getEncoder().encodeToString(historyFilePath.getBytes());
+            wikiPageHistoryService.saveRecord(wikiSpace.getId(),pageFile.getPageId(),encodedPath);
         }
         else {
             //正常上传文件

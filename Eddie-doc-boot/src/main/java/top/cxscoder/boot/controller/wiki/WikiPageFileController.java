@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -115,8 +116,10 @@ public class WikiPageFileController {
 
 	@GetMapping("/preview/history")
 	public void previewHistory(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, String url) throws IOException {
-		int lastIndex = url.lastIndexOf("\\");
-		String fileName = url.substring(lastIndex + 1);
+		byte[] decodedBytes = Base64.getDecoder().decode(url);
+		String decodePath= new String(decodedBytes);
+		int lastIndex = decodePath.lastIndexOf("\\");
+		String fileName = decodePath.substring(lastIndex + 1);
 		try {
 			fileName = new String(fileName.getBytes("utf-8"), "ISO-8859-1");
 		} catch (UnsupportedEncodingException e) {
@@ -127,7 +130,7 @@ public class WikiPageFileController {
 		String mimeType = HttpUtil.getMimeType(fileName);
 		httpServletResponse.setHeader("Content-Type", mimeType);
 		// TODO 媒体文件可以分块查看
-        String fileUrl = historyPath + File.separator + url;
+        String fileUrl = historyPath + File.separator + decodePath;
 		// 调用文件下载方法
 		wikiPageFileService.previewHistoryFile(httpServletResponse,fileUrl);
 	}

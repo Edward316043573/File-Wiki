@@ -59,8 +59,9 @@ public class OfficeController {
     public JSONObject previewOfficeFile(HttpServletRequest request, @RequestBody PreviewOfficeFileDTO previewOfficeFileDTO) {
         String previewUrl = null;
 
-        if (previewOfficeFileDTO.getPreviewUrl() !=null){
-          previewUrl = request.getScheme() + "://" + deploymentHost + ":"
+        if (previewOfficeFileDTO.getPreviewUrl()!=null){
+
+            previewUrl = request.getScheme() + "://" + deploymentHost + ":"
                     + port + "/wiki/page/file/preview/history?"
                     + "url=" + previewOfficeFileDTO.getPreviewUrl()
                     + "&isMin=false&shareBatchNum=undefined&extractionCode=undefined";
