@@ -56,10 +56,11 @@ wiki:
   upload-path: ${SERVER_PORT:E:\计算机\项目\file-manage\Eddie-Doc\wikiFiles}
   # 是否检查目录有被系统定期清理的风险，强烈建议开启
   upload-path-check: true
-
+  export-path: ${SERVER_PORT:E:\计算机\项目\file-manage\Eddie-Doc\export}
+  history-path: ${SERVER_PORT:E:\计算机\项目\file-manage\Eddie-Doc\history}
 
 deployment:
-  host: 172.21.192.1
+  host: 192.168.31.6
 
 filesize-max: 5242880
 

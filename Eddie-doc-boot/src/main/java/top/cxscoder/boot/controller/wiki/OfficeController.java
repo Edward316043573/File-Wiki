@@ -1,5 +1,6 @@
 package top.cxscoder.boot.controller.wiki;
 
+import cn.hutool.core.lang.UUID;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -55,17 +56,18 @@ public class OfficeController {
 
     @Resource
     private WikiPageFileService wikiPageFileService;
+
     @PostMapping("/previewofficefile")
     public JSONObject previewOfficeFile(HttpServletRequest request, @RequestBody PreviewOfficeFileDTO previewOfficeFileDTO) {
         String previewUrl = null;
 
-        if (previewOfficeFileDTO.getPreviewUrl()!=null){
+        if (previewOfficeFileDTO.getPreviewUrl() != null) {
 
             previewUrl = request.getScheme() + "://" + deploymentHost + ":"
                     + port + "/wiki/page/file/preview/history?"
                     + "url=" + previewOfficeFileDTO.getPreviewUrl()
                     + "&isMin=false&shareBatchNum=undefined&extractionCode=undefined";
-        }else {
+        } else {
             previewUrl = request.getScheme() + "://" + deploymentHost + ":"
                     + port + "/wiki/page/file/preview?"
                     + "userFileId=" + previewOfficeFileDTO.getUserFileId()
@@ -91,6 +93,12 @@ public class OfficeController {
             );
 
             JSONObject jsonObject = new JSONObject();
+            /* 这个地方完全是因为当前项目回显PDF不得已而为之
+            正常情况下应该会导致onlyoffice自带的历史记录出错
+            不过该项目目前没这个需求所以为了效率这么搞得*/
+            if (previewOfficeFileDTO.getPreviewUrl() != null) {
+                fileModel.getDocument().setKey(UUID.fastUUID().toString());
+            }
             jsonObject.put("file", fileModel);
             jsonObject.put("docserviceApiUrl", docserviceSite + docserviceApiUrl);
             jsonObject.put("reportName", userFile.getFileName());
@@ -134,7 +142,6 @@ public class OfficeController {
 //            throw new ServiceException(e.getMessage());
 //        }
 //    }
-
 
 
 }

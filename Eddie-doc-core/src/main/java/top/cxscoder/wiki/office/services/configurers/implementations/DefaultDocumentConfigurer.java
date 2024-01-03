@@ -60,6 +60,7 @@ public class DefaultDocumentConfigurer implements DocumentConfigurer<DefaultDocu
         document.setFileType(fileUtility.getFileExtension(fileName).replace(".",""));  // set the file type to the document config
         document.getInfo().setFavorite(wrapper.getFavorite());  // set the favorite parameter to the document config
 
+        // TODO PDF文件这个地方怎么搞呢
         String key =  serviceConverter.  // get the document key
                         generateRevisionId(userFile.getId().toString() + userFile.getUpdateTime().getTime());
 
