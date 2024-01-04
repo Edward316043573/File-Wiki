@@ -1,10 +1,10 @@
-package top.cxscoder.wiki.service.manage.impl;
+package top.cxscoder.system.services.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import top.cxscoder.system.domain.entity.RoleMenu;
 import top.cxscoder.system.mapper.RoleMenuMapper;
-import top.cxscoder.wiki.service.manage.RoleMenuService;
+import top.cxscoder.system.services.RoleMenuService;
 
 /**
  * @author: Wang Jianping

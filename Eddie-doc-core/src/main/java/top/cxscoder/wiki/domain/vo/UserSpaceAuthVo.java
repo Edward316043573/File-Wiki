@@ -10,12 +10,12 @@ import lombok.Data;
  */
 @Data
 public class UserSpaceAuthVo {
-	private Long groupId;
-	private Integer editPage;
-	private Integer commentPage;
-	private Integer deletePage;
-	private Integer pageFileUpload;
-	private Integer pageFileDelete;
-	private Integer pageAuthManage;
+    private Long roleId;
+    private Integer editPage;
+    private Integer commentPage;
+    private Integer deletePage;
+    private Integer pageFileUpload;
+    private Integer pageFileDelete;
+    private Integer pageAuthManage;
 
 }

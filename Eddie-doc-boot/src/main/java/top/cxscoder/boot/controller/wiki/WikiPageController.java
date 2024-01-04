@@ -34,7 +34,6 @@ import top.cxscoder.wiki.enums.PageFileSource;
 import top.cxscoder.wiki.framework.consts.SpaceType;
 import top.cxscoder.wiki.repository.mapper.WikiPageContentMapper;
 import top.cxscoder.wiki.repository.mapper.WikiPageMapper;
-import top.cxscoder.wiki.security.DocUserDetails;
 import top.cxscoder.wiki.service.WikiPageUploadService;
 import top.cxscoder.wiki.service.common.WikiPageAuthService;
 import top.cxscoder.wiki.service.manage.*;
@@ -447,10 +446,9 @@ public class WikiPageController {
     @PostMapping("/unlock")
     public void unlock(Long pageId) {
         String lockKey = CachePrefix.WIKI_LOCK_PAGE + pageId;
-        DocUserDetails pageLockUser = CacheUtil.get(lockKey);
+        User pageLockUser = CacheUtil.get(lockKey);
         if (pageLockUser != null) {
-            LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            User currentUser = loginUser.getUser();
+            User currentUser = loginService.getCurrentUser();
             if (Objects.equals(pageLockUser.getUserId(), currentUser.getUserId())) {
                 CacheUtil.remove(lockKey);
             }
@@ -459,17 +457,16 @@ public class WikiPageController {
 
     @PostMapping("/lock")
     public void editLock(Long pageId) {
-        LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        User currentUser = loginUser.getUser();
+        User currentUser = loginService.getCurrentUser();
         String lockKey = CachePrefix.WIKI_LOCK_PAGE + pageId;
-        DocUserDetails pageLockUser = CacheUtil.get(lockKey);
+        User pageLockUser = CacheUtil.get(lockKey);
         if (pageLockUser != null) {
             if (!Objects.equals(pageLockUser.getUserId(), currentUser.getUserId())) {
 //                return DocResponseJson.warn("当前页面正在被：" + pageLockUser.getUsername() + " 编辑");
-                throw new ServiceException("当前页面正在被：" + pageLockUser.getUsername() + " 编辑");
+                throw new ServiceException("当前页面正在被：" + pageLockUser.getUserName() + " 编辑");
             }
         }
-        CacheUtil.put(lockKey, new DocUserDetails(currentUser.getUserId(), currentUser.getUserName()));
+        CacheUtil.put(lockKey, new User(currentUser.getUserId(), currentUser.getUserName()));
     }
 
     @PostMapping("/searchByEs")

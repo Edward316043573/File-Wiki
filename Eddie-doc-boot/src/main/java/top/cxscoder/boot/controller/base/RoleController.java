@@ -13,7 +13,7 @@ import top.cxscoder.system.domain.entity.Role;
 import top.cxscoder.system.domain.entity.RoleMenu;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.system.services.RoleService;
-import top.cxscoder.wiki.service.manage.RoleMenuService;
+import top.cxscoder.system.services.RoleMenuService;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -54,8 +54,6 @@ public class RoleController {
         Page<Role> rolePage = roleService.page(new Page<>(roleDTO.getPage(), roleDTO.getPageSize()),queryWrapper);
         List<Role> updateRoles = rolePage.getRecords().stream().map(role -> {
             Long roleId = role.getRoleId();
-//            QueryWrapper<RoleMenu> wrapper = new QueryWrapper<>();
-//            wrapper.eq("roleid", roleId);
             LambdaQueryWrapper<RoleMenu> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(RoleMenu::getRoleId,roleId);
             List<RoleMenu> roleMenus = roleMenuService.list(wrapper);

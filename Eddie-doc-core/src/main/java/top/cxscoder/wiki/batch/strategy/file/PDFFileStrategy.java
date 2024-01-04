@@ -113,7 +113,7 @@ public class PDFFileStrategy implements IFileStrategy {
                 }
             }
            catch (IOException e){
-                throw new ServiceException("文件上传异常");
+                throw new ServiceException("文件上传异常" + e.getMessage());
             }
             // 上传文件将原文件覆盖
             // 关闭新输入流
@@ -166,7 +166,7 @@ public class PDFFileStrategy implements IFileStrategy {
             try(InputStream newInputStream = file.getInputStream()){
                 Files.copy(newInputStream, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }catch (IOException e){
-                throw new ServiceException("上传文件异常");
+                throw new ServiceException("上传文件异常" + e.getMessage());
             }
             // 上传文件将原文件覆盖
 

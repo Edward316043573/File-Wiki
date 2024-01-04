@@ -17,6 +17,7 @@ public interface MenuService extends IService<Menu> {
 
     /**
      * 检查菜单名字是否唯一
+     *
      * @param menu 菜单信息
      * @return
      */
@@ -25,5 +26,7 @@ public interface MenuService extends IService<Menu> {
     boolean hasChildByMenuId(Long menuId);
 
     boolean checkMenuExistRole(Long menuId);
+
+    List<Menu> selectMenuListByRoleId(Long RoleId);
 
 }

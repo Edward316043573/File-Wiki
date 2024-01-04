@@ -1,4 +1,4 @@
-package top.cxscoder.wiki.service.manage;
+package top.cxscoder.system.services;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import top.cxscoder.system.domain.entity.RoleMenu;

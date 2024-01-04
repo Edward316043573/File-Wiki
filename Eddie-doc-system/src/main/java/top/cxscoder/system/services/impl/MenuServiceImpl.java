@@ -5,11 +5,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import top.cxscoder.system.domain.entity.Menu;
+import top.cxscoder.system.domain.entity.RoleMenu;
 import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.mapper.MenuMapper;
 import top.cxscoder.system.services.MenuService;
+import top.cxscoder.system.services.RoleMenuService;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,11 +26,13 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     @Resource
     MenuMapper menuMapper;
 
-
+    @Resource
+    RoleMenuService roleMenuService;
 
     /**
      * 查询当前用户的菜单
-     * @param menu 菜单信息
+     *
+     * @param menu        菜单信息
      * @param loginUserId 当前用户ID
      * @return 菜单列表
      */
@@ -39,15 +44,12 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
         // 管理员显示所有菜单信息
         User user = new User();
-        if (user.isAdmin(loginUserId))
-        {
-            queryWrapper.eq(!ObjectUtils.isEmpty(menu.getVisible()),Menu::getVisible,menu.getVisible())
-                    .eq(!ObjectUtils.isEmpty(menu.getStatus()),Menu::getStatus,menu.getStatus())
-                    .like(!ObjectUtils.isEmpty(menu.getMenuName()),Menu::getMenuName,menu.getMenuName());
+        if (user.isAdmin(loginUserId)) {
+            queryWrapper.eq(!ObjectUtils.isEmpty(menu.getVisible()), Menu::getVisible, menu.getVisible())
+                    .eq(!ObjectUtils.isEmpty(menu.getStatus()), Menu::getStatus, menu.getStatus())
+                    .like(!ObjectUtils.isEmpty(menu.getMenuName()), Menu::getMenuName, menu.getMenuName());
             menuList = menuMapper.selectList(queryWrapper);
-        }
-        else
-        {
+        } else {
             // 非管理员查对应的菜单
             menu.setParams(new HashMap<>());
             menu.getParams().put("userId", loginUserId);
@@ -59,7 +61,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
 
     @Override
     public List<Menu> selectMenuList(Long loginUserId) {
-        return selectMenuList(new Menu(),loginUserId);
+        return selectMenuList(new Menu(), loginUserId);
     }
 
 
@@ -73,12 +75,11 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     public boolean checkMenuNameUnique(Menu menu) {
         Long menuId = ObjectUtils.isEmpty(menu.getMenuId()) ? -1L : menu.getMenuId();
         LambdaQueryWrapper<Menu> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Menu::getMenuName,menu.getMenuName())
-                        .eq(Menu::getParentId,menu.getParentId());
+        queryWrapper.eq(Menu::getMenuName, menu.getMenuName())
+                .eq(Menu::getParentId, menu.getParentId());
         Menu info = menuMapper.selectOne(queryWrapper);
 
-        if (!ObjectUtils.isEmpty(info) && info.getMenuId().longValue() != menuId.longValue())
-        {
+        if (!ObjectUtils.isEmpty(info) && info.getMenuId().longValue() != menuId.longValue()) {
             return false;
         }
         return true;
@@ -88,7 +89,7 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     public boolean hasChildByMenuId(Long menuId) {
         // 查找parent_id为当前菜单id的结果 有的话则返回false
         LambdaQueryWrapper<Menu> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Menu::getParentId,menuId);
+        wrapper.eq(Menu::getParentId, menuId);
         List<Menu> menus = menuMapper.selectList(wrapper);
         return menus.size() > 0;
     }
@@ -96,6 +97,14 @@ public class MenuServiceImpl extends ServiceImpl<MenuMapper, Menu> implements Me
     @Override
     public boolean checkMenuExistRole(Long menuId) {
         return menuMapper.checkMenuExistRole(menuId) > 0;
+    }
+
+    @Override
+    public List<Menu> selectMenuListByRoleId(Long roleId) {
+        List<RoleMenu> roleMenuList = roleMenuService.lambdaQuery().eq(RoleMenu::getRoleId, roleId).list();
+        List<Menu> res = new ArrayList<>();
+        roleMenuList.forEach(rm -> res.add(menuMapper.selectById(rm.getMenuId())));
+        return res;
     }
 
 
