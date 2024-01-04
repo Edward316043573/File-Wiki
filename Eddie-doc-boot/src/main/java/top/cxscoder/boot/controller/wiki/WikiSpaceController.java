@@ -97,8 +97,7 @@ public class WikiSpaceController {
 	@PostMapping("/update")
 	public WikiSpace update(@RequestBody WikiSpace wikiSpace) {
 		Long id = wikiSpace.getId();
-		LoginUser loginUser = (LoginUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		User currentUser = loginUser.getUser();
+		User currentUser = loginService.getCurrentUser();
 		if (id != null && id > 0) {
 			WikiSpace wikiSpaceSel = wikiSpaceService.getById(id);
 			// 不是创建人不能修改空间

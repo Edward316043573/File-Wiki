@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,8 +62,7 @@ public class OfficeController {
     public JSONObject previewOfficeFile(HttpServletRequest request, @RequestBody PreviewOfficeFileDTO previewOfficeFileDTO) {
         String previewUrl = null;
 
-        if (previewOfficeFileDTO.getPreviewUrl() != null) {
-
+        if ( !ObjectUtils.isEmpty(previewOfficeFileDTO.getPreviewUrl()) ) {
             previewUrl = request.getScheme() + "://" + deploymentHost + ":"
                     + port + "/wiki/page/file/preview/history?"
                     + "url=" + previewOfficeFileDTO.getPreviewUrl()
@@ -107,41 +107,4 @@ public class OfficeController {
             throw new ServiceException(e.getMessage());
         }
     }
-//    @PostMapping("/previewofficefile")
-//    public JSONObject previewOfficeFile(HttpServletRequest request, @RequestBody PreviewOfficeFileDTO previewOfficeFileDTO) {
-//        try {
-//            String previewUrl = request.getScheme() + "://" + deploymentHost + ":"
-//                    + port + "/wiki/page/file/preview?"
-//                    + "userFileId=" + previewOfficeFileDTO.getUserFileId()
-//                    + "&isMin=false&shareBatchNum=undefined&extractionCode=undefined";
-//            User currentUser = loginService.getCurrentUser();
-//            WikiPageFile userFile = wikiPageFileService.lambdaQuery().eq(WikiPageFile::getPageId, previewOfficeFileDTO.getUserFileId()).one();
-//            Action action = Action.view;
-//            Type type = Type.desktop;
-//            Locale locale = new Locale("zh");
-//            top.cxscoder.wiki.office.entities.User user = new top.cxscoder.wiki.office.entities.User (currentUser);
-//            FileModel fileModel = fileConfigurer.getFileModel(
-//                    DefaultFileWrapper
-//                            .builder()
-//                            .userFile(userFile)
-//                            .type(type)
-//                            .lang(locale.toLanguageTag())
-//                            .action(action)
-//                            .user(user)
-//                            .actionData(previewUrl)
-//                            .build()
-//            );
-//
-//            JSONObject jsonObject = new JSONObject();
-//            jsonObject.put("file",fileModel);
-////            jsonObject.put("fileHistory", historyManager.getHistory(fileModel.getDocument()));  // get file history and add it to the model
-//            jsonObject.put("docserviceApiUrl", docserviceSite + docserviceApiUrl);
-//            jsonObject.put("reportName",userFile.getFileName());
-//            return jsonObject;
-//        } catch (Exception e) {
-//            throw new ServiceException(e.getMessage());
-//        }
-//    }
-
-
 }
