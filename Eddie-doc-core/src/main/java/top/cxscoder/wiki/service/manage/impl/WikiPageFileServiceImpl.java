@@ -11,6 +11,7 @@ import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocume
 import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import top.cxscoder.common.exception.ServiceException;
 import top.cxscoder.wiki.domain.entity.WikiPageFile;
 import top.cxscoder.wiki.domain.entity.WikiSpace;
 import top.cxscoder.wiki.repository.mapper.WikiPageFileMapper;
@@ -29,7 +30,7 @@ import java.util.List;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author 暮光：城中城
@@ -47,24 +48,35 @@ public class WikiPageFileServiceImpl extends ServiceImpl<WikiPageFileMapper, Wik
     private WikiSpaceService wikiSpaceService;
     @Resource
     private WikiPageFileService wikiPageFileService;
+
     @Override
     public void previewFile(HttpServletResponse httpServletResponse, Long userFileId) throws IOException {
         // 找到目录
         WikiPageFile file = wikiPageFileService.lambdaQuery().eq(WikiPageFile::getPageId, userFileId).one();
         String filePath = uploadPath + File.separator + file.getFileUrl();
         // 下载 IOUtils.copy 把一个输入流写出到指定的输出流
-        IOUtils.copy(new FileInputStream(filePath), httpServletResponse.getOutputStream());
+        try (FileInputStream fis = new FileInputStream(filePath)) {
+            IOUtils.copy(fis, httpServletResponse.getOutputStream());
+        } catch (IOException e) {
+            // 处理异常
+            throw new ServiceException("下载文件失败" + e.getMessage());
+        }
     }
 
     @Override
     public void previewHistoryFile(HttpServletResponse httpServletResponse, String url) throws IOException {
-        IOUtils.copy(new FileInputStream(url), httpServletResponse.getOutputStream());
+        try (FileInputStream fis = new FileInputStream(url)) {
+            IOUtils.copy(fis, httpServletResponse.getOutputStream());
+        } catch (IOException e) {
+            // 处理异常
+            throw new ServiceException("下载文件失败" + e.getMessage());
+        }
     }
 
     @Override
     public String export(Long spaceId) {
         LambdaQueryWrapper<WikiSpace> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(WikiSpace::getId,spaceId);
+        queryWrapper.eq(WikiSpace::getId, spaceId);
         WikiSpace space = wikiSpaceService.getOne(queryWrapper);
         String spaceName = space.getName();
         String filePath = uploadPath + File.separator + spaceName;
@@ -86,7 +98,7 @@ public class WikiPageFileServiceImpl extends ServiceImpl<WikiPageFileMapper, Wik
             targetDocument.getDocumentCatalog().setDocumentOutline(documentOutline);
             //保存文件
             File exportFile = new File(outputFolderPath);
-            if (!exportFile.exists()){
+            if (!exportFile.exists()) {
                 exportFile.mkdirs();
             }
             targetDocument.save(outputFileName);
@@ -99,8 +111,7 @@ public class WikiPageFileServiceImpl extends ServiceImpl<WikiPageFileMapper, Wik
         return outputFileName;
     }
 
-    private static void mergePDFs(String folderPath, PDDocument targetDocument, PDOutlineItem parentOutlineItem)
-            throws IOException {
+    private static void mergePDFs(String folderPath, PDDocument targetDocument, PDOutlineItem parentOutlineItem) throws IOException {
         File folder = new File(folderPath);
         File[] files = folder.listFiles();
 

@@ -116,12 +116,6 @@ public class PDFFileStrategy implements IFileStrategy {
            catch (IOException e){
                 throw new ServiceException("文件上传异常" + e.getMessage());
             }
-            // 上传文件将原文件覆盖
-            // 关闭新输入流
-//            //转存文件
-//            Files.move(originFile.toPath(), historyFile.toPath());
-//            //上传文件将原文件覆盖
-//            file.transferTo(originFile);
             //2.更新wiki_page_file表,同样修改user和time
             pageFile.setUpdateTime(new Date());
             pageFile.setUpdateUserName(currentUser.getUserName());
@@ -164,13 +158,10 @@ public class PDFFileStrategy implements IFileStrategy {
                 dest.getParentFile().mkdirs();
             }
             // 如果文件不存在则创建父目录
-            InputStream newInputStream = file.getInputStream();
-            try{
+            try(InputStream newInputStream = file.getInputStream()) {
                 Files.copy(newInputStream, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
-            }catch (IOException e){
-                throw new ServiceException("上传文件异常");
-            }finally{
-                newInputStream.close();
+            } catch (IOException e){
+                throw new ServiceException("上传文件异常"+e.getMessage());
             }
             wikipageUploadService.update(wikiPage, "", "pdf文件");
             // 存WikiPageFile
