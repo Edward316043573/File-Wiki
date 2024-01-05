@@ -1,7 +1,5 @@
 package top.cxscoder.boot.controller.wiki;
 
-import com.alibaba.fastjson.JSON;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -14,19 +12,15 @@ import top.cxscoder.system.domain.entity.User;
 import top.cxscoder.system.services.LoginService;
 import top.cxscoder.wiki.common.constant.DocSysModuleType;
 import top.cxscoder.wiki.common.constant.DocSysType;
-import top.cxscoder.wiki.common.constant.UserMsgType;
 import top.cxscoder.wiki.domain.entity.*;
 import top.cxscoder.wiki.domain.vo.UserPageAuthVo;
 import top.cxscoder.wiki.framework.consts.WikiAuthType;
 import top.cxscoder.wiki.repository.mapper.UserGroupAuthMapper;
-import top.cxscoder.wiki.security.DocUserUtil;
-import top.cxscoder.wiki.security.UserAuthInfo;
 import top.cxscoder.wiki.service.common.WikiPageAuthService;
 import top.cxscoder.wiki.service.manage.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 文档控制器
@@ -56,65 +50,65 @@ public class WikiPageAuthController {
     @Transactional
     //todo authList 权限列表
     public void assign(Long pageId, String authList) {
-        User currentUser = loginService.getCurrentUser();
-        WikiPage wikiPageSel = wikiPageService.getById(pageId);
-        WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
-        String canConfigAuth = wikiPageAuthService.canConfigAuth(wikiSpaceSel, pageId, currentUser.getUserId());
-        if (canConfigAuth != null) {
-//            return DocResponseJson.warn(canConfigAuth);
-            throw new ServiceException(canConfigAuth);
-        }
-        List<String> authNameList = Stream.of(WikiAuthType.values()).map(WikiAuthType::getCode).collect(Collectors.toList());
-        QueryWrapper<AuthInfo> queryWrapper = new QueryWrapper<>();
-        queryWrapper.in("auth_name", authNameList);
-        Collection<AuthInfo> authInfoList = authInfoService.list(queryWrapper);
-        Map<String, Long> authInfoMap = authInfoList.stream().collect(Collectors.toMap(AuthInfo::getAuthName, AuthInfo::getId));
-        // 先删除页面的所有用户的权限
-        userAuthService.deleteModuleAuth(DocSysType.WIKI.getType(), DocSysModuleType.Wiki.PAGE.getType(), pageId);
-
-        List<UserPageAuthVo> authVoList = JSON.parseArray(authList, UserPageAuthVo.class);
-        for (UserPageAuthVo authVo : authVoList) {
-            List<UserAuth> userAuthList = new LinkedList<>();
-            if (Objects.equals(authVo.getEditPage(), 1)) {
-                Long authId = authInfoMap.get(WikiAuthType.EDIT_PAGE.getCode());
-                UserAuth userAuth = this.createUserAuth(pageId, currentUser.getUserId(), authVo.getUserId(), authId);
-                userAuthList.add(userAuth);
-            }
-            if (Objects.equals(authVo.getDeletePage(), 1)) {
-                Long authId = authInfoMap.get(WikiAuthType.DELETE_PAGE.getCode());
-                UserAuth userAuth = this.createUserAuth(pageId, currentUser.getUserId(), authVo.getUserId(), authId);
-                userAuthList.add(userAuth);
-            }
-            if (Objects.equals(authVo.getPageFileUpload(), 1)) {
-                Long authId = authInfoMap.get(WikiAuthType.PAGE_FILE_UPLOAD.getCode());
-                UserAuth userAuth = this.createUserAuth(pageId, currentUser.getUserId(), authVo.getUserId(), authId);
-                userAuthList.add(userAuth);
-            }
-            if (Objects.equals(authVo.getPageFileDelete(), 1)) {
-                Long authId = authInfoMap.get(WikiAuthType.PAGE_FILE_DELETE.getCode());
-                UserAuth userAuth = this.createUserAuth(pageId, currentUser.getUserId(), authVo.getUserId(), authId);
-                userAuthList.add(userAuth);
-            }
-            if (Objects.equals(authVo.getPageAuthManage(), 1)) {
-                Long authId = authInfoMap.get(WikiAuthType.PAGE_AUTH_MANAGE.getCode());
-                UserAuth userAuth = this.createUserAuth(pageId, currentUser.getUserId(), authVo.getUserId(), authId);
-                userAuthList.add(userAuth);
-            }
-            if (userAuthList.isEmpty()) {
-                continue;
-            }
-            // 保存权限，重新登录后可用，后期可以考虑在这里直接修改缓存里的用户权限
-            userAuthService.saveBatch(userAuthList);
-            // 给相关人发送消息
-            UserInfo userInfo = userInfoService.getById(authVo.getUserId());
-            UserMessage userMessage = userMessageService.createUserMessage(currentUser, pageId, wikiPageSel.getName(), DocSysType.WIKI, UserMsgType.WIKI_PAGE_AUTH);
-            userMessage.setAffectUserId(userInfo.getId());
-            userMessage.setAffectUserName(userInfo.getUserName());
-            userMessageService.addWikiMessage(userMessage);
-            // 刷新用户权限
-            List<UserAuthInfo> userAuthListNew = userAuthService.getUserAuthSet(authVo.getUserId());
-            DocUserUtil.setUserAuth(authVo.getUserId(), userAuthListNew);
-        }
+//        User currentUser = loginService.getCurrentUser();
+//        WikiPage wikiPageSel = wikiPageService.getById(pageId);
+//        WikiSpace wikiSpaceSel = wikiSpaceService.getById(wikiPageSel.getSpaceId());
+//        String canConfigAuth = wikiPageAuthService.canConfigAuth(wikiSpaceSel, pageId, currentUser.getUserId());
+//        if (canConfigAuth != null) {
+////            return DocResponseJson.warn(canConfigAuth);
+//            throw new ServiceException(canConfigAuth);
+//        }
+//        List<String> authNameList = Stream.of(WikiAuthType.values()).map(WikiAuthType::getCode).collect(Collectors.toList());
+//        QueryWrapper<AuthInfo> queryWrapper = new QueryWrapper<>();
+//        queryWrapper.in("auth_name", authNameList);
+//        Collection<AuthInfo> authInfoList = authInfoService.list(queryWrapper);
+//        Map<String, Long> authInfoMap = authInfoList.stream().collect(Collectors.toMap(AuthInfo::getAuthName, AuthInfo::getId));
+//        // 先删除页面的所有用户的权限
+//        userAuthService.deleteModuleAuth(DocSysType.WIKI.getType(), DocSysModuleType.Wiki.PAGE.getType(), pageId);
+//
+//        List<UserPageAuthVo> authVoList = JSON.parseArray(authList, UserPageAuthVo.class);
+//        for (UserPageAuthVo authVo : authVoList) {
+//            List<UserAuth> userAuthList = new LinkedList<>();
+//            if (Objects.equals(authVo.getEditPage(), 1)) {
+//                Long authId = authInfoMap.get(WikiAuthType.EDIT_PAGE.getCode());
+//                UserAuth userAuth = this.createUserAuth(pageId, currentUser.getUserId(), authVo.getUserId(), authId);
+//                userAuthList.add(userAuth);
+//            }
+//            if (Objects.equals(authVo.getDeletePage(), 1)) {
+//                Long authId = authInfoMap.get(WikiAuthType.DELETE_PAGE.getCode());
+//                UserAuth userAuth = this.createUserAuth(pageId, currentUser.getUserId(), authVo.getUserId(), authId);
+//                userAuthList.add(userAuth);
+//            }
+//            if (Objects.equals(authVo.getPageFileUpload(), 1)) {
+//                Long authId = authInfoMap.get(WikiAuthType.PAGE_FILE_UPLOAD.getCode());
+//                UserAuth userAuth = this.createUserAuth(pageId, currentUser.getUserId(), authVo.getUserId(), authId);
+//                userAuthList.add(userAuth);
+//            }
+//            if (Objects.equals(authVo.getPageFileDelete(), 1)) {
+//                Long authId = authInfoMap.get(WikiAuthType.PAGE_FILE_DELETE.getCode());
+//                UserAuth userAuth = this.createUserAuth(pageId, currentUser.getUserId(), authVo.getUserId(), authId);
+//                userAuthList.add(userAuth);
+//            }
+//            if (Objects.equals(authVo.getPageAuthManage(), 1)) {
+//                Long authId = authInfoMap.get(WikiAuthType.PAGE_AUTH_MANAGE.getCode());
+//                UserAuth userAuth = this.createUserAuth(pageId, currentUser.getUserId(), authVo.getUserId(), authId);
+//                userAuthList.add(userAuth);
+//            }
+//            if (userAuthList.isEmpty()) {
+//                continue;
+//            }
+//            // 保存权限，重新登录后可用，后期可以考虑在这里直接修改缓存里的用户权限
+//            userAuthService.saveBatch(userAuthList);
+//            // 给相关人发送消息
+//            UserInfo userInfo = userInfoService.getById(authVo.getUserId());
+//            UserMessage userMessage = userMessageService.createUserMessage(currentUser, pageId, wikiPageSel.getName(), DocSysType.WIKI, UserMsgType.WIKI_PAGE_AUTH);
+//            userMessage.setAffectUserId(userInfo.getId());
+//            userMessage.setAffectUserName(userInfo.getUserName());
+//            userMessageService.addWikiMessage(userMessage);
+//            // 刷新用户权限
+//            List<UserAuthInfo> userAuthListNew = userAuthService.getUserAuthSet(authVo.getUserId());
+//            DocUserUtil.setUserAuth(authVo.getUserId(), userAuthListNew);
+//        }
     }
 
     @PostMapping("/list")
