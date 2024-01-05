@@ -22,6 +22,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * <p>
@@ -101,7 +105,9 @@ public class WikiPageFileServiceImpl extends ServiceImpl<WikiPageFileMapper, Wik
         File[] files = folder.listFiles();
 
         if (files != null) {
-            for (File file : files) {
+            List<File> fileList = Arrays.asList(files);
+            Collections.sort(fileList, Comparator.comparingLong(File::lastModified));
+            for (File file : fileList) {
                 if (file.isFile() && file.getName().endsWith(".pdf")) {
                     PDDocument sourceDocument = PDDocument.load(file);
                     for (int i = 0; i < sourceDocument.getNumberOfPages(); i++) {

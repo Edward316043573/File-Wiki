@@ -67,6 +67,7 @@ public class PDFFileStrategy implements IFileStrategy {
         Long pageId = wikiPageFile.getPageId();
         LambdaQueryWrapper<WikiPage> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(WikiPage::getParentId, pageId);
+        wrapper.eq(WikiPage::getSpaceId, wikiPageFile.getSpaceId());
         List<WikiPage> wikiPages = wikiPageService.list(wrapper);
         List<WikiPage> wikiPageList = wikiPages.stream().filter(w -> w.getName().equals(fileName)).collect(Collectors.toList());
         if (wikiPageList.size() > 0) {
@@ -108,7 +109,7 @@ public class PDFFileStrategy implements IFileStrategy {
                 // 关闭文件流
                 file.getInputStream().close();
                 // 重新打开输入流，读取新上传的文件
-                try ( InputStream newInputStream = file.getInputStream()){
+                try ( InputStream newInputStream = file.getInputStream() ){
                     Files.copy(newInputStream, originFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 }
             }
@@ -163,23 +164,14 @@ public class PDFFileStrategy implements IFileStrategy {
                 dest.getParentFile().mkdirs();
             }
             // 如果文件不存在则创建父目录
-            try(InputStream newInputStream = file.getInputStream()){
+            InputStream newInputStream = file.getInputStream();
+            try{
                 Files.copy(newInputStream, dest.toPath(), StandardCopyOption.REPLACE_EXISTING);
             }catch (IOException e){
-                throw new ServiceException("上传文件异常" + e.getMessage());
+                throw new ServiceException("上传文件异常");
+            }finally{
+                newInputStream.close();
             }
-            // 上传文件将原文件覆盖
-
-            // 关闭新输入流
-//            newInputStream.close();
-//            file.transferTo(dest);
-
-//            RandomAccessFile is = new RandomAccessFile(dest, "r");
-//            PDFParser parser = new PDFParser(is);
-//            parser.parse(); // TODO 效率低
-//            PDDocument doc = parser.getPDDocument();
-//            PDFTextStripper textStripper = new PDFTextStripper();
-//            String context = textStripper.getText(doc); // TODO 效率低
             wikipageUploadService.update(wikiPage, "", "pdf文件");
             // 存WikiPageFile
             String UUID = IdUtil.fastUUID();
@@ -199,7 +191,6 @@ public class PDFFileStrategy implements IFileStrategy {
             uploadFile.setFileSize(file.getSize());
             uploadFile.setDownloadNum(0);
             wikiPageFileService.save(uploadFile);
-            //修改history 表
         }
     }
 }
