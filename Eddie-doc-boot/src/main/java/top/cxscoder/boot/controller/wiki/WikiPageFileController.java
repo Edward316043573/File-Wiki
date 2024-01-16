@@ -136,7 +136,7 @@ public class WikiPageFileController {
 	}
 
 	@GetMapping("/PDFStorePath")
-	public Map<String,String> exportPath(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Long spaceId){
+	public Map<String,String> exportPath(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Long spaceId) throws IOException {
 		String outputFileName = wikiPageFileService.export(spaceId);
 		Map<String,String> pathMap = new HashMap<>();
 		pathMap.put("path",outputFileName);

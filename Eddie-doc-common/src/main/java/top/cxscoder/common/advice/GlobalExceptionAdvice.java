@@ -10,9 +10,6 @@ import top.cxscoder.common.exception.UnauthorizedException;
 import top.cxscoder.common.utils.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -35,7 +32,7 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler({ServiceException.class})
     public ResponseResult<Map<String, Object>> globalHandler(Exception e, HttpServletRequest request) {
         log.error("服务端异常", e);
-        return ResponseResult.error("服务端异常", WebUtils.buildResponseBody(e.getMessage(), request));
+        return ResponseResult.error(e.getMessage(), WebUtils.buildResponseBody(e.getMessage(), request));
     }
 
 }
