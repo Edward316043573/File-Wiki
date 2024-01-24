@@ -129,9 +129,9 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
             LambdaQueryWrapper<RoleMenu> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(RoleMenu::getRoleId,roleId);
             int res = roleMenuMapper.delete(wrapper);
-            if (res == 0){
-                throw new ServiceException("删除关联表失败");
-            }
+//            if (res == 0){
+//                throw new ServiceException("删除关联表失败");
+//            }
         }
         return true;
     }

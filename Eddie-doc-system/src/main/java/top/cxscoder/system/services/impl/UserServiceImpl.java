@@ -162,9 +162,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             LambdaQueryWrapper<UserRole> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(UserRole::getUserId,userId);
             int res = userRoleMapper.delete(wrapper);
-            if (res == 0){
-                throw new ServiceException("删除关联表失败");
-            }
+//            if (res == 0){
+//                throw new ServiceException("删除关联表失败");
+//            }
         }
         return true;
     }
