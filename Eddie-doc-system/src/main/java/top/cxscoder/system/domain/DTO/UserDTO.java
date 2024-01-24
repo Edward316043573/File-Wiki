@@ -24,6 +24,9 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO extends PageVo {
+
+    @TableField(exist = false)
+    private boolean admin;
     /** 用户ID */
     @TableId(value = "user_id", type = IdType.AUTO)
     private Long userId;

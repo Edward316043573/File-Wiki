@@ -40,6 +40,7 @@ public class UserController {
     @Resource
     PasswordEncoder passwordEncoder;
 
+
     @Resource
     UserRoleService userRoleService;
     /**
@@ -104,6 +105,7 @@ public class UserController {
     @PutMapping
     public boolean edit(@RequestBody UserDTO userDTO)
     {
+        userDTO.setPassword(null);
         User user = BeanUtil.copyProperties(userDTO,User.class);
 
         return userService.updateUserWithRole(user);
